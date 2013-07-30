@@ -10,7 +10,7 @@ class SeasonsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @seasons }
+      format.json { render :json => @seasons }
     end
   end
 
@@ -21,7 +21,7 @@ class SeasonsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @season }
+      format.json { render :json => @season }
     end
   end
 
@@ -32,7 +32,7 @@ class SeasonsController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @season }
+      format.json { render :json => @season }
     end
   end
 
@@ -48,11 +48,11 @@ class SeasonsController < ApplicationController
 
     respond_to do |format|
       if @season.save
-        format.html { redirect_to @season, notice: 'Season was successfully created.' }
-        format.json { render json: @season, status: :created, location: @season }
+        format.html { redirect_to @season, :notice => 'Season was successfully created.' }
+        format.json { render :json => @season, :status => :created, :location => @season }
       else
-        format.html { render action: "new" }
-        format.json { render json: @season.errors, status: :unprocessable_entity }
+        format.html { render :action => "new" }
+        format.json { render :json => @season.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -88,11 +88,11 @@ class SeasonsController < ApplicationController
 
     respond_to do |format|
       if @season.update_attributes(params[:season])
-        format.html { redirect_to @season, notice: 'Season was successfully updated.' }
+        format.html { redirect_to @season, :notice => 'Season was successfully updated.' }
         format.json { render :json => @season }
       else
-        format.html { render action: "edit" }
-        format.json { render json: @season.errors, status: :unprocessable_entity }
+        format.html { render :action => "edit" }
+        format.json { render :json => @season.errors, :status => :unprocessable_entity }
       end
     end
   end
