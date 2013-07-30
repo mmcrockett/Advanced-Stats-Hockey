@@ -9,7 +9,7 @@ var Season = Backbone.Model.extend({
       pointhog = '';
     }
 
-    return [this.loaded(), this.name(), pointhog];
+    return [this.loaded(), this.id, this.name(), pointhog];
   }
 });
 
@@ -62,6 +62,7 @@ var SeasonView = Backbone.View.extend({
     var view = this;
 
     data.addColumn('boolean', 'Loaded');
+    data.addColumn('number', 'Id');
     data.addColumn('string', 'Season');
     data.addColumn('string', 'Pointhog URL');
 
@@ -95,7 +96,7 @@ var SeasonView = Backbone.View.extend({
       this.wrapper = new google.visualization.ChartWrapper({
                       chartType: 'Table',
                       dataTable: data,
-                      options: {showRowNumber: false, allowHtml: true, sortColumn: 1},
+                      options: {showRowNumber: false, allowHtml: true, sortColumn: 1, sortAscending: false},
                       containerId: view.data_div.attr('id')
                     });
       google.visualization.events.addListener(this.wrapper, 'ready', function() {
@@ -116,6 +117,16 @@ var SeasonView = Backbone.View.extend({
       });
     });
   }, 800)
+  ,store: function() {
+    this.errors.reset();
+    jQuery.error('new-season');
+
+    this.items.forEach(function(item, i, obj){
+      if (true == item.isNew()) {
+        item.save();
+      }   
+    }); 
+  }
   ,store_selection: function() {
     var gitems = this.wrapper.getChart().getSelection();
 
