@@ -115,6 +115,10 @@ var SeasonView = Backbone.View.extend({
         season.save();
         season.fetch();
       });
+      jQuery('.google-visualization-table-td:first-of-type').click(function(e) {
+        var season = view.items.findWhere({id:view.selection.item.id});
+        season.save();
+      });
     });
   }, 800)
   ,store: function() {
