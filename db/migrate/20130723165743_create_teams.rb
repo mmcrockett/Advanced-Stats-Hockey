@@ -6,6 +6,7 @@ class CreateTeams < ActiveRecord::Migration
       t.integer :points
       t.integer :goals_scored
       t.integer :goals_allowed
+      t.integer :place
       t.references :season, :null => false
 
       t.timestamps

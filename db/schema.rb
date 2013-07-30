@@ -11,15 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130723184854) do
-
-  create_table "junktests", :force => true do |t|
-    t.string   "title"
-    t.string   "body"
-    t.boolean  "islive"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
+ActiveRecord::Schema.define(:version => 20130723172605) do
 
   create_table "seasons", :force => true do |t|
     t.string   "name",                          :null => false
@@ -35,6 +27,7 @@ ActiveRecord::Schema.define(:version => 20130723184854) do
     t.integer  "points"
     t.integer  "goals_scored"
     t.integer  "goals_allowed"
+    t.integer  "place"
     t.integer  "season_id",     :null => false
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
