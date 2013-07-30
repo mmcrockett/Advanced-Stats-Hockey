@@ -1,11 +1,14 @@
 var Team = Backbone.Model.extend({
   name: function(){return this.get("name") || "";}
   ,games: function(){return this.get("games");}
+  ,place: function(){return this.get("place");}
   ,points: function(){return this.get("points");}
   ,gf: function(){return this.get("goals_scored");}
   ,ga: function(){return this.get("goals_allowed");}
   ,season_id: function(){return this.get("season_id");}
-  ,gdata: function(isTeamGroup, seasons){
+  ,isChampion: function(){
+  }
+  ,gdata: function(isTeam, seasons){
     var gaa = this.ga()/this.games();
     var gfa = this.gf()/this.games();
     var diff = this.gf() - this.ga();
@@ -15,10 +18,17 @@ var Team = Backbone.Model.extend({
     var xDiff = this.points() - xPts;
     var data = [this.games(), this.points(), diff, this.gf(), this.gf()/this.games(), this.ga(), gaa, x, xW, xPts, xDiff];
 
-    if (true == isTeamGroup) {
+    if (true == isTeam) {
       data.unshift(seasons.findWhere({id:parseInt(this.season_id())}).name());
+      data.unshift(this.season_id().toString());
     } else {
       data.unshift(this.name());
+    }
+
+    if (true == _.isFinite(this.place())) {
+      data.unshift(this.place().toString());
+    } else {
+      data.unshift('---');
     }
 
     return data;
@@ -28,7 +38,7 @@ var Team = Backbone.Model.extend({
 var TeamCollection = Backbone.Collection.extend({
   model: Team
   ,url: "/teams"
-  ,gheaders: function(isTeamGroup) {
+  ,gheaders: function(isTeam) {
     var headers = [
       {name: 'Games', type: 'number'}
       ,{name: 'Points', type: 'number'}
@@ -43,11 +53,14 @@ var TeamCollection = Backbone.Collection.extend({
       ,{name: 'xDiff', type: 'number'}
     ];
 
-    if (true == isTeamGroup) {
+    if (true == isTeam) {
       headers.unshift({name: 'Season', type: 'string'});
+      headers.unshift({name: 'Id', type: 'string'});
     } else {
       headers.unshift({name: 'Team', type: 'string'});
     }
+
+    headers.unshift({name: 'Place', type: 'string'});
 
     return headers;
   }
@@ -74,10 +87,11 @@ var TeamView = Backbone.View.extend({
       view.accordions[type].accordion = jQuery('#' + type + '-accordion');
       view.accordions[type].grouping  = jqElem.attr('grouping');
       view.accordions[type].wrappers  = [];
+      view.accordions[type].isTeam    = ('team' == type);
       jqElem.click(function(e) {
         view.accordions[type].accordion.show();
         view.accordions[type].accordion.find('.google-visualization-table-table').css('width', Math.floor(view.accordions[type].accordion.width() * 0.95) + 'px');
-        if ('team' == type) {
+        if (true == view.accordions[type].isTeam) {
           view.accordions['season'].accordion.hide();
         } else {
           view.accordions['team'].accordion.hide();
@@ -131,7 +145,9 @@ var TeamView = Backbone.View.extend({
     var summary_row = data.getFilteredRows([{column: 0, value: 'Summary'}]);
     var redformatter = new google.visualization.NumberFormat({negativeColor: 'red'});
     var fixedformatter = new google.visualization.NumberFormat({fractionDigits: 0});
-    var fixedformatter = new google.visualization.NumberFormat({fractionDigits: 0});
+    var percentformatter = new google.visualization.NumberFormat({pattern:'##%'});
+    var no_decimal_list = ["Place", "Games", "Points", "GA", "GF", "+/-", "xPts", "xDiff"];
+    var percent_list = ["xW"];
 
     if (false == _.isEmpty(summary_row)) {
       _.forEach(summary_row, function(row, i, list) {
@@ -146,22 +162,38 @@ var TeamView = Backbone.View.extend({
     }
 
     this.add_summary(data);
-    redformatter.format(data, 3);
-    fixedformatter.format(data, 3);
-    redformatter.format(data, 5);
-    redformatter.format(data, 7);
-    redformatter.format(data, 8);
-    redformatter.format(data, 9);
-    redformatter.format(data, 11);
-    fixedformatter.format(data, 11);
-    fixedformatter.format(data, 1);
-    fixedformatter.format(data, 2);
-    fixedformatter.format(data, 4);
-    fixedformatter.format(data, 6);
-    fixedformatter.format(data, 10);
+
+    _(data.getNumberOfColumns()).times(function(col) {
+      if ('number' == data.getColumnType(col)) {
+        redformatter.format(data, col);
+        if (-1 != _.indexOf(no_decimal_list, data.getColumnLabel(col))) {
+          fixedformatter.format(data, col);
+        }
+        if (-1 != _.indexOf(percent_list, data.getColumnLabel(col))) {
+          percentformatter.format(data, col);
+        }
+      }
+    });
     sorted_rows.push(data.getNumberOfRows() - 1);
     data_view.setRows(sorted_rows);
     wrapper.getChart().draw(data_view, {allowHtml: true, sort: 'event', sortColumn: e.column, sortAscending: e.ascending});
+    jQuery('.google-visualization-table-td:first-of-type').editable(_.bind(function(value, settings) {
+      var wrapper = this.wrapper;
+      var teams   = this.teams;
+      var gitems  = wrapper.getChart().getSelection();
+
+      if (1 == gitems.length) {
+        var team = teams.findWhere({id: wrapper.getDataTable().getRowProperty(gitems[0].row, "item_id")});
+
+        if (true == _.isObject(team)) {
+          team.set("place", value);
+          team.save();
+          team.fetch();
+        }
+      }
+
+      return value;
+    },{teams: this.items, wrapper: wrapper}));
   }
   ,render: function(accordion) {
     var view = this;
@@ -169,18 +201,19 @@ var TeamView = Backbone.View.extend({
 
     if (0 != display_items.length) {
       _.forEach(display_items.groupBy(accordion.grouping), function(teams, group_name, list) {
-        var isTeamGroup = true;
-
-        if (true == _.isFinite(group_name)) {
+        if (false == accordion.isTeam) {
           group_name = view.seasons.findWhere({id:parseInt(group_name)}).name();
-          isTeamGroup = false;
         }
 
         var data = new google.visualization.DataTable();
         var clean_name = jQuery.idEscape(group_name);
         var wrapper = null;
 
-        accordion.accordion.append('<div id="' + clean_name + '"></div>');
+        if (true == accordion.isTeam) {
+          accordion.accordion.append('<div id="' + clean_name + '"></div>');
+        } else {
+          accordion.accordion.prepend('<div id="' + clean_name + '"></div>');
+        }
         jQuery('#' + clean_name).before('<h3>' + group_name + '</h3>');
         accordion.wrappers.unshift(new google.visualization.ChartWrapper({
                       chartType: 'Table',
@@ -188,12 +221,13 @@ var TeamView = Backbone.View.extend({
                       containerId: clean_name
                     }))
 
-        _.forEach(display_items.gheaders(isTeamGroup), function(header, i, list) {
+        _.forEach(display_items.gheaders(accordion.isTeam), function(header, i, list) {
           data.addColumn(header.type, header.name);
         });
 
         teams.forEach(function(team, i, list){
-          data.addRow(team.gdata(isTeamGroup, view.seasons));
+          data.addRow(team.gdata(accordion.isTeam, view.seasons));
+          data.setRowProperty(data.getNumberOfRows() - 1, "item_id", team.id);
         });
 
         accordion.wrappers[0].setDataTable(data);
@@ -209,7 +243,11 @@ var TeamView = Backbone.View.extend({
         });
 
         var oneInitialSort = _.once(function() {
-          view.sort(wrapper, {column: 0, ascending: true});
+          var column = 1;
+          if (false == accordion.isTeam) {
+            column = 3;
+          }
+          view.sort(wrapper, {column: column, ascending: false});
         });
 
         google.visualization.events.addListener(wrapper, 'ready', afterCreateAccordion);
