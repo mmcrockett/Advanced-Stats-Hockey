@@ -61,8 +61,10 @@ class SeasonsController < ApplicationController
   # PUT /seasons/1.json
   def update
     @season = Season.find(params[:id])
+    page = nil
 
-    if (false == @season.loaded?())
+    if ((nil == @season.pointhog) || (Time.now.yesterday > @season.updated_at))
+      updated = true
       page = Nokogiri::HTML(open(params[:pointhog]))
       page.css('tr th:first-child').each do |team_th|
         if ("Team" == team_th.text().strip)
@@ -70,9 +72,15 @@ class SeasonsController < ApplicationController
         end
 
         while (nil != tr)
-          team = Team.new()
-          team.name = tr.css('td')[0].text().strip
-          team.season = @season
+          team_name = tr.css('td')[0].text().strip
+          team = Team.where("name = ? AND season_id = ?", team_name, @season).first
+
+          if (nil == team)
+            team = Team.new()
+            team.name = team_name
+            team.season = @season
+          end
+
           team.games         = tr.css('td')[1].text()
           team.points        = tr.css('td')[6].text()
           team.goals_scored  = tr.css('td')[7].text()
@@ -81,15 +89,17 @@ class SeasonsController < ApplicationController
           tr = tr.next
         end
       end
+
+      params[:loaded] = true
+      params[:season][:loaded] = true
+    else
+      updated = false
     end
 
-    params[:loaded] = true
-    params[:season][:loaded] = true
-
     respond_to do |format|
-      if @season.update_attributes(params[:season])
-        format.html { redirect_to @season, :notice => 'Season was successfully updated.' }
-        format.json { render :json => @season }
+      if ((true == updated) && (@season.update_attributes(params[:season])))
+          format.html { redirect_to @season, :notice => 'Season was successfully updated.' }
+          format.json { render :json => @season }
       else
         format.html { render :action => "edit" }
         format.json { render :json => @season.errors, :status => :unprocessable_entity }
