@@ -73,12 +73,13 @@ class SeasonsController < ApplicationController
 
         while (nil != tr)
           team_name = tr.css('td')[0].text().strip
-          team = Team.where("name = ? AND season_id = ?", team_name, @season).first
 
-          if (nil == team)
+          if (nil == @season.pointhog)
             team = Team.new()
             team.name = team_name
             team.season = @season
+          else
+            team = Team.where("name = ? AND season_id = ?", team_name, @season).first
           end
 
           team.games         = tr.css('td')[1].text()
@@ -97,9 +98,11 @@ class SeasonsController < ApplicationController
     end
 
     respond_to do |format|
-      if ((true == updated) && (@season.update_attributes(params[:season])))
-          format.html { redirect_to @season, :notice => 'Season was successfully updated.' }
-          format.json { render :json => @season }
+      if (false == updated)
+        format.json { render :json => @season }
+      elsif (@season.update_attributes(params[:season]))
+        format.html { redirect_to @season, :notice => 'Season was successfully updated.' }
+        format.json { render :json => @season }
       else
         format.html { render :action => "edit" }
         format.json { render :json => @season.errors, :status => :unprocessable_entity }
