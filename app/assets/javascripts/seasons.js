@@ -44,10 +44,8 @@ var SeasonView = Backbone.View.extend({
       view.clear_selection();
       view.render();
     });
-    this.listenTo(this.items, 'error', function(model) {
-      view.errors.push(model);
-      jQuery.error('new-player', 'Issues saving: Highlighted in red in table.');
-      view.items.remove(model);
+    this.listenTo(this.items, 'error', function(model, response) {
+      jQuery.error('season', response.responseText);
     });
   }
   ,display_items: function() {
