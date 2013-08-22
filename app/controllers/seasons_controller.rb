@@ -99,7 +99,7 @@ class SeasonsController < ApplicationController
 
     respond_to do |format|
       if (false == updated)
-        format.json { render :json => @season }
+        format.json { render :json => "Update time is too close: #{@season.updated_at}", :status => :unprocessable_entity }
       elsif (@season.update_attributes(params[:season]))
         format.html { redirect_to @season, :notice => 'Season was successfully updated.' }
         format.json { render :json => @season }
