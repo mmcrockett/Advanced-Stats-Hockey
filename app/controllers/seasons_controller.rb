@@ -79,6 +79,7 @@ class SeasonsController < ApplicationController
             team.name = team_name
             team.season = @season
           else
+            @season.touch
             team = Team.where("name = ? AND season_id = ?", team_name, @season).first
           end
 
