@@ -1,5 +1,6 @@
 var Season = Backbone.Model.extend({
   name: function(){return this.get("name") || "";}
+  ,updated: function(){return this.get("updated_at") || "";}
   ,pointhog: function(){return this.get("pointhog");}
   ,loaded: function(){return this.get("loaded");}
   ,gdata: function(){
@@ -25,7 +26,6 @@ var SeasonView = Backbone.View.extend({
   }
   ,initialize: function(items, options) {
     var view = this;
-    this.errors = this.items.clone();
     this.items.reset(items);
     this.single_add_button = jQuery('#single-add-button');
     this.single_add_input  = jQuery('#single-import-field');
@@ -44,10 +44,8 @@ var SeasonView = Backbone.View.extend({
       view.clear_selection();
       view.render();
     });
-    this.listenTo(this.items, 'error', function(model) {
-      view.errors.push(model);
-      jQuery.error('new-player', 'Issues saving: Highlighted in red in table.');
-      view.items.remove(model);
+    this.listenTo(this.items, 'error', function(model, response) {
+      jQuery.error('season', response.responseText);
     });
   }
   ,display_items: function() {
@@ -66,27 +64,26 @@ var SeasonView = Backbone.View.extend({
     data.addColumn('string', 'Season');
     data.addColumn('string', 'Pointhog URL');
 
-    if (0 != this.errors.length) {
-      this.errors.forEach(function(item, i, list){
-        var rowIndex = data.addRow(item.gdata());
-
-        for (var j = 0; j < data.getNumberOfColumns(); j++) {
-          data.setProperty(rowIndex, j, "style", "background-color:#FF7E7E;");
-        }
-      }, this);
-    }
-
     if (0 != display_items.length) {
       display_items.forEach(function(item, i, list){
         var rowIndex = data.addRow(item.gdata());
+        data.setRowProperty(rowIndex, "item_id", item.id);
 
         for (var j = 0; j < data.getNumberOfColumns(); j++) {
-          if (true == item.isNew()) {
-            data.setProperty(rowIndex, j, "style", "background-color:#CCFFFF;");
-          } else if (true == item.error) {
-            data.setProperty(rowIndex, j, "style", "background-color:#FF7E7E;");
-          } else if (0 == j) {
-            data.setRowProperty(rowIndex, "item_id", item.id);
+          if (0 == j) {
+            var style  = "cursor:pointer;";
+            var dayago = new Date();
+            dayago.setDate(dayago.getDate() - 1);
+
+            if (false == data.getValue(rowIndex, j)) {
+              style += "background-color:#f2dede;"
+            } else if (dayago > new Date(item.updated())) {
+              style += "background-color:#fcf8e3;"
+            } else {
+              style += "background-color:#e7e9f9;"
+            }
+
+            data.setProperty(rowIndex, j, "style", style);
           }
         }
       }, this);
@@ -117,12 +114,12 @@ var SeasonView = Backbone.View.extend({
       });
       jQuery('.google-visualization-table-td:first-of-type').click(function(e) {
         var season = view.items.findWhere({id:view.selection.item.id});
+        jQuery.error('season');
         season.save();
       });
     });
   }, 800)
   ,store: function() {
-    this.errors.reset();
     jQuery.error('new-season');
 
     this.items.forEach(function(item, i, obj){
