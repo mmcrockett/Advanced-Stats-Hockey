@@ -21,7 +21,7 @@ group :assets do
 end
 
 gem 'jquery-rails'
-#gem 'therubyracer'
+gem 'therubyracer'
 gem 'nokogiri'
 
 # To use ActiveModel has_secure_password
