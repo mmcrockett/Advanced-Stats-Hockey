@@ -20,7 +20,7 @@ var Team = Backbone.Model.extend({
 
     if (true == isTeam) {
       data.unshift(seasons.findWhere({id:parseInt(this.season_id())}).name());
-      data.unshift(this.season_id().toString());
+      data.unshift(this.season_id());
     } else {
       data.unshift(this.name());
     }
@@ -55,7 +55,7 @@ var TeamCollection = Backbone.Collection.extend({
 
     if (true == isTeam) {
       headers.unshift({name: 'Season', type: 'string'});
-      headers.unshift({name: 'Id', type: 'string'});
+      headers.unshift({name: 'Id', type: 'number'});
     } else {
       headers.unshift({name: 'Team', type: 'string'});
     }
@@ -113,7 +113,9 @@ var TeamView = Backbone.View.extend({
     _(data.getNumberOfRows()).times(function(row) {
       _(data.getNumberOfColumns()).times(function(col) {
         if ('number' == data.getColumnType(col)) {
-          if (true == _.isFinite(summary[col])) {
+          if ('Id' == data.getColumnLabel(col)) {
+            summary[col] = null;
+          } else if (true == _.isFinite(summary[col])) {
             summary[col] += data.getValue(row, col);
           } else {
             summary[col] = data.getValue(row, col);
@@ -146,7 +148,7 @@ var TeamView = Backbone.View.extend({
     var redformatter = new google.visualization.NumberFormat({negativeColor: 'red'});
     var fixedformatter = new google.visualization.NumberFormat({fractionDigits: 0});
     var percentformatter = new google.visualization.NumberFormat({pattern:'##%'});
-    var no_decimal_list = ["Place", "Games", "Points", "GA", "GF", "+/-", "xPts", "xDiff"];
+    var no_decimal_list = ["Place", "Games", "Points", "GA", "GF", "+/-", "xPts", "xDiff", "Id"];
     var percent_list = ["xW"];
 
     if (false == _.isEmpty(summary_row)) {
