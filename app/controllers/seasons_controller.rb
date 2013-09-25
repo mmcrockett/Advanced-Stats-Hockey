@@ -63,7 +63,7 @@ class SeasonsController < ApplicationController
     @season = Season.find(params[:id])
     page = nil
 
-    if ((nil == @season.pointhog) || (Time.now.yesterday > @season.updated_at))
+    if ((false == @season.valid_pointhog?(params[:pointhog])) || (Time.now.yesterday > @season.updated_at))
       updated = true
       page = Nokogiri::HTML(open(params[:pointhog]))
       page.css('tr th:first-child').each do |team_th|
@@ -74,7 +74,7 @@ class SeasonsController < ApplicationController
         while (nil != tr)
           team_name = tr.css('td')[0].text().strip
 
-          if (nil == @season.pointhog)
+          if (false == @season.valid_pointhog?(params[:pointhog]))
             team = Team.new()
             team.name = team_name
             team.season = @season
