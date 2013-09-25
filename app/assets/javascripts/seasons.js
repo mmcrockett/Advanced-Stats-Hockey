@@ -97,7 +97,6 @@ var SeasonView = Backbone.View.extend({
                       containerId: view.data_div.attr('id')
                     });
       google.visualization.events.addListener(this.wrapper, 'ready', function() {
-        google.visualization.events.addListener(view.wrapper, 'select', function(){view.store_selection();});
         jQuery('.google-visualization-table-td:first-of-type').css('width', 75);
       });
     } else {
@@ -107,13 +106,13 @@ var SeasonView = Backbone.View.extend({
     this.wrapper.draw();
     google.visualization.events.addListener(this.wrapper, 'ready', function() {
       jQuery('.google-visualization-table-td:last-of-type').editable(function(value, settings) {
-        var season = view.items.findWhere({id:view.selection.item.id});
+        var season = view.items.findWhere({id:view.get_id_from_html(this)});
         season.set("pointhog", value);
         season.save();
         season.fetch();
       });
       jQuery('.google-visualization-table-td:first-of-type').click(function(e) {
-        var season = view.items.findWhere({id:view.selection.item.id});
+        var season = view.items.findWhere({id:view.get_id_from_html(e.target)});
         jQuery.error('season');
         season.save();
       });
@@ -128,17 +127,8 @@ var SeasonView = Backbone.View.extend({
       }   
     }); 
   }
-  ,store_selection: function() {
-    var gitems = this.wrapper.getChart().getSelection();
-
-    if (1 == gitems.length) {
-      var item = this.items.findWhere({id: this.wrapper.getDataTable().getRowProperty(gitems[0].row, "item_id")});
-
-      this.selection = {
-        gitem: gitems[0]
-        ,item: item
-      };
-    }
+  ,get_id_from_html: function(elem) {
+    return _.number(jQuery(elem).parent().children().eq(1).html());
   }
 });
 
@@ -170,10 +160,10 @@ jQuery.idEscape = function(str) {
 };
 
 _.number = function(v) {
-  if (true == _.isFinite(v)) {
-    return v;
-  } else {
+  if ((true == _.isString(v)) || (false == _.isFinite(v))) {
     return parseInt(v);
+  } else {
+    return v;
   }
 };
 _.toString = function(v) {
