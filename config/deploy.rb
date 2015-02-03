@@ -1,8 +1,9 @@
 require 'bundler/capistrano'
+require 'rvm/capistrano'
 
-set :user, "advancedhockeystats"
+set :user, "washingrvingrails"
 set :domain, "advancedhockeystats.mmcrockett.com"
-set :applicationdir, "/home/advancedhockeystats/advancedhockeystats.mmcrockett.com"
+set :applicationdir, "/home/washingrvingrails/advancedhockeystats.mmcrockett.com"
 set :application, "advancedhockeystats"
 set :rails_env, :production
 set :use_sudo, false
@@ -10,9 +11,6 @@ set :use_sudo, false
 set :scm, :git
 set :branch, "master"
 set :repository,  "git@github.com:mmcrockett/Advanced-Stats-Hockey.git"
-set :default_environment, {
-  'PATH' => "/usr/lib/ruby/gems/1.8/bin:$PATH"
-}
 
 # roles (servers)
 role :web, domain
