@@ -1,0 +1,22 @@
+<% if (true == Rails.env.development?) %>
+  <% minified = "" %>
+<% else %>
+  <% minified = ".min" %>
+<% end %>
+
+<% jasmine ||= false %>
+
+<% versions = {
+  :angular => "1.5.7",
+  :underscore => "1.8.3",
+  :bootstrap  => "3.3.7",
+  :angular_ui => "2.0.2",
+  :angular_local_storage => "0.2.7"
+}
+%>
+
+<% if (false == jasmine) %>
+  <%= render :partial => "common/header/stylesheet_includes", :locals => {:versions => versions, :minified => minified} %>
+<% end %>
+
+<%= render :partial => "common/header/javascript_includes", :locals => {:versions => versions, :minified => minified} %>

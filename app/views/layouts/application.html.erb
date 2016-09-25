@@ -1,37 +1,25 @@
+<% name = params[:controller] %>
 <!DOCTYPE html>
-<html>
+<html ng-app="AdvancedHockeyStats">
 <head>
-  <% links = ["seasons", "teams"] %>
-  <% name = params[:controller] %>
-  <title>Hockey - <%= name.capitalize %></title>
-  <%= stylesheet_link_tag "application", :media => "all" %>
-  <%= stylesheet_link_tag "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css", :media => "all" %>
+  <meta name="description" content="Keeping track of B1 with advanced stats." />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="shortcut icon"  type="image/x-icon" href="/favicon.ico?version=1">
+  <title>AHS : <%= name.capitalize %></title>
 
-  <% external_javascript.each do |jsinclude| %>
-    <%= javascript_include_tag(jsinclude) %>
-  <% end %>
-
-  <%= javascript_include_tag "application" %>
-
+  <%= render :partial => "common/header/header_includes" %>
+  <%= javascript_include_tag("application") %>
   <%= csrf_meta_tags %>
 </head>
 <body>
-<ul id="menu" class="ui-corner-all">
-  <% links.each do |link| %>
-    <% if (name == link) %>
-      <% selected = "ui-state-focus" %>
-    <% else %>
-      <% selected = "" %>
-    <% end %>
-  <li class="<%= selected %>"><a href="<%= link %>"><%= link.capitalize %></a></li>
+  <% if (true == Rails.env.development?) %>
+    <%= javascript_tag("jQuery.development = true;") %>
   <% end %>
-</ul>
-<div class="notice"><div id="error-div" class="ui-corner-all"></div></div>
-<hr>
-
+  <div id="main">
+    <div class="container">
+    <%= render :partial => "common/nav_bar" %>
 <%= yield %>
-
-<%= javascript_tag("jQuery.ready(jQuery('#menu').menubar())") %>
-
+    </div>
+  </div>
 </body>
 </html>

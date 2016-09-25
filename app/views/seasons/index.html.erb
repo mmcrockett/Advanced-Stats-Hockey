@@ -1,3 +1,30 @@
-<%= render :partial => "common/list" %>
-
-<%= javascript_tag("jQuery.ready(new SeasonView(#{@seasons.to_json}))") %>
+<div class="navbar navbar-default" style="background-color:#FFFFFF;padding:5px 5px;">
+  <p id="notice"><%= notice %></p>
+  <p>
+  <%= link_to new_season_path(), :class => "btn btn-default btn-sm" do %>
+    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
+  <% end %>
+  </p>
+  <table class="table table-striped">
+    <tr>
+      <th>id</th>
+      <th>name</th>
+      <th>pointhog url</th>
+      <th>complete?</th>
+    </tr>
+    <% @seasons.each do |season| %>
+      <tr>
+        <td><%= link_to(season.id, edit_season_path(season)) %></td>
+        <td><%= link_to(season.name, edit_season_path(season)) %></td>
+        <td><%= season.pointhog_url %></td>
+        <td>
+          <% if (true == season.complete) %>
+            <span class="glyphicon glyphicon-ok"></span>
+          <% else %>
+            <span class="glyphicon glyphicon-minus"></span>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>

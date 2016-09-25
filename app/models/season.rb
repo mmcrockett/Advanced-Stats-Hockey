@@ -1,14 +1,21 @@
 class Season < ActiveRecord::Base
-  attr_accessible :name, :pointhog, :loaded
-  has_many :teams
+  before_save :load_data
 
-  def valid_pointhog?(pointhog_url)
-    if (nil == self.pointhog)
-      return false
-    elsif (self.pointhog != pointhog_url)
-      return false
+  def load_data
+    if (true == self.parse?)
+      #page = Nokogiri::HTML(open(self.pointhog_url))
+    end
+  end
+
+  def parse?
+    if (false == self.complete?)
+      if (true == self.pointhog_url.is_a?(String))
+        if ((Time.now.yesterday > self.updated_at) || (true == self.pointhog_url_changed?))
+          return true
+        end
+      end
     end
 
-    return true
+    return false
   end
 end

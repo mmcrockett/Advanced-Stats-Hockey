@@ -1,0 +1,16 @@
+<% javascript_libraries = [
+  "//code.jquery.com/jquery-2.1.1#{minified}.js",
+  "//cdnjs.cloudflare.com/ajax/libs/underscore.js/#{versions[:underscore]}/underscore#{minified.gsub('.','-')}.js",
+  "https://code.jquery.com/ui/1.11.0/jquery-ui#{minified}.js",
+  "https://maxcdn.bootstrapcdn.com/bootstrap/#{versions[:bootstrap]}/js/bootstrap#{minified}.js",
+  "https://ajax.googleapis.com/ajax/libs/angularjs/#{versions[:angular]}/angular#{minified}.js",
+  "https://ajax.googleapis.com/ajax/libs/angularjs/#{versions[:angular]}/angular-resource#{minified}.js",
+  "https://bouil.github.io/angular-google-chart/ng-google-chart.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/#{versions[:angular_ui]}/ui-bootstrap#{minified}.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/#{versions[:angular_ui]}/ui-bootstrap-tpls#{minified}.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/#{versions[:angular_local_storage]}/angular-local-storage#{minified}.js"
+]
+%> 
+  <% javascript_libraries.each do |library| %>
+    <%= javascript_include_tag "#{library}" %>
+  <% end %>
