@@ -1,11 +1,11 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: MyString
-  url: MyString
-  import: 1
+complete:
+  name: complete
+  pointhog_url: MyString
+  complete: true
 
-two:
-  name: MyString
-  url: MyString
-  import: 1
+not_complete:
+  name: not_complete
+  pointhog_url: MyString
+  complete: false
