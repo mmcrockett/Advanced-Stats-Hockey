@@ -5,7 +5,22 @@ complete:
   pointhog_url: MyString
   complete: true
 
+complete_2:
+  name: complete_2
+  pointhog_url: MyString
+  complete: true
+
 not_complete:
   name: not_complete
   pointhog_url: MyString
+  complete: false
+
+empty:
+  name: empty
+  pointhog_url: MyString
+  complete: false
+
+franchise_change:
+  name: fchange
+  pointhog_url: none
   complete: false

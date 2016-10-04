@@ -18,7 +18,7 @@
         <td><%= link_to(season.name, edit_season_path(season)) %></td>
         <td><%= season.pointhog_url %></td>
         <td>
-          <% if (true == season.complete) %>
+          <% if (true == season.complete?) %>
             <span class="glyphicon glyphicon-ok"></span>
           <% else %>
             <span class="glyphicon glyphicon-minus"></span>

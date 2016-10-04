@@ -1,0 +1,36 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+team_a:
+  name: TeamA
+  franchise: TeamA
+  season: complete
+
+team_b:
+  name: TeamB
+  franchise: TeamB
+  season: complete
+
+team_c:
+  name: TeamC
+  franchise: TeamC
+  season: complete
+
+team_d_s0:
+  name: TeamD
+  franchise: TeamC
+  season: complete_2
+
+team_d_s1:
+  name: TeamD
+  franchise: TeamC
+  season: not_complete
+
+team_x:
+  name: TeamX
+  franchise: xxxxx
+  season: franchise_change
+
+team_y:
+  name: TeamY
+  franchise: yyyy
+  season: franchise_change

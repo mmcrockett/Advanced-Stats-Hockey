@@ -1,0 +1,28 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+game_0:
+  home_team: team_a
+  home_score: 3
+  away_team: team_b
+  away_score: 2
+  overtime: true
+  game_date: 2016-09-27
+  elo_processed: false
+
+game_1:
+  home_team: team_b
+  home_score: 4
+  away_team: team_c
+  away_score: 2
+  overtime: false
+  game_date: 2016-09-26
+  elo_processed: false
+
+game_2:
+  home_team: team_y
+  home_score: 4
+  away_team: team_x
+  away_score: 2
+  overtime: false
+  game_date: 2016-11-01
+  elo_processed: true

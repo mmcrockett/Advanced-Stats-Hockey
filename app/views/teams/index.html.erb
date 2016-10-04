@@ -1,0 +1,22 @@
+<div class="navbar navbar-default" style="background-color:#FFFFFF;padding:5px 5px;">
+  <p id="notice"><%= notice %></p>
+  <p>
+  <%= link_to new_team_path(), :class => "btn btn-default btn-sm" do %>
+    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
+  <% end %>
+  </p>
+  <table class="table table-striped">
+    <tr>
+      <th>id</th>
+      <th>name</th>
+      <th>franchise</th>
+    </tr>
+    <% @teams.each do |team| %>
+      <tr>
+        <td><%= link_to(team.id, edit_team_path(team)) %></td>
+        <td><%= link_to(team.name, edit_team_path(team)) %></td>
+        <td><%= team.franchise %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>

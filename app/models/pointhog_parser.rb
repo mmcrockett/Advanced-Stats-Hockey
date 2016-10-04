@@ -1,6 +1,9 @@
 class PointhogParser
-  HOME_SCORE_KEY = :hscore.to_s
-  AWAY_SCORE_KEY = :ascore.to_s
+  attr_reader :games
+  attr_reader :teams
+
+  HOME_SCORE_KEY = :home_score.to_s
+  AWAY_SCORE_KEY = :away_score.to_s
   SHOOTOUT_KEY   = :shootout.to_s
 
   POINTHOG_DATE_FORMAT = "%m/%d/%y %l:%M %p"
@@ -13,26 +16,16 @@ class PointhogParser
   POINTHOG_AWAY_COLUMN = 'away'
   POINTHOG_COLUMNS = [POINTHOG_DATE_COLUMN, POINTHOG_HOME_COLUMN, POINTHOG_AWAY_COLUMN]
 
-  def self.parse_schedule(page)
-    games   = []
-    columns = {}
-    schedule_table   = page.css('table[id*=Schedule]')
+  def initialize(page)
+    @season_complete = true
+    @games = []
+    @teams = Set.new
 
-    schedule_table.css('tr').each do |row|
-      if (true == row[:class].include?("Header"))
-        columns = PointhogParser.parse_header_row(row)
-      elsif (true == columns.empty?)
-        raise "!ERROR: Header row not found."
-      else
-        game = PointhogParser.parse_row(columns, row)
+    parse_schedule(page)
+  end
 
-        if (false == game.empty?)
-          games << game
-        end
-      end
-    end
-
-    return games
+  def season_complete?
+    return @season_complete
   end
 
   def self.parse_header_row(row)
@@ -59,7 +52,7 @@ class PointhogParser
 
     if (true == status.include?(POINTHOG_FINISHED_GAME_IDENTIFIER.downcase()))
       POINTHOG_COLUMNS.each do |column_name|
-        game[column_name] = cells[columns[column_name]].text().strip().downcase()
+        game[column_name] = cells[columns[column_name]].text().strip().downcase().titleize()
       end
 
       game[HOME_SCORE_KEY] = PointhogParser.parse_score(cells, columns[POINTHOG_HOME_COLUMN])
@@ -77,11 +70,15 @@ class PointhogParser
   end
 
   def self.parse_datetime(date_str)
+    value = nil
+
     if (true == date_str.is_a?(String))
-      return DateTime.strptime("#{date_str} Central Time (US & Canada)", "#{POINTHOG_DATE_FORMAT} %Z")
+      value = DateTime.strptime("#{date_str} Central Time (US & Canada)", "#{POINTHOG_DATE_FORMAT} %Z")
     else
-      return date_str
+      value = date_str
     end
+
+    return Game.new({:game_date => value}).game_date
   end
 
   def self.parse_score(cells, column_index)
@@ -93,5 +90,32 @@ class PointhogParser
     end
 
     return v
+  end
+
+  private
+  def parse_schedule(page)
+    columns = {}
+    schedule_table   = page.css('table[id*=Schedule]')
+
+    schedule_table.css('tr').each do |row|
+      if (true == row[:class].include?("Header"))
+        columns = PointhogParser.parse_header_row(row)
+      elsif (true == columns.empty?)
+        raise "!ERROR: Header row not found."
+      else
+        game = PointhogParser.parse_row(columns, row)
+
+        if (false == game.empty?)
+          @teams << game[POINTHOG_HOME_COLUMN]
+          @teams << game[POINTHOG_AWAY_COLUMN]
+          @games << game
+        else
+          @season_complete = false
+          break
+        end
+      end
+    end
+
+    return self
   end
 end

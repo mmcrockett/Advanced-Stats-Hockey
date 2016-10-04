@@ -1,0 +1,31 @@
+<%= form_for(@team, :html => { :class => "form-horizontal" }) do |f| %>
+  <% if @team.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@team.errors.count, "error") %> prohibited this team from being saved:</h2>
+
+      <ul>
+      <% @team.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label(:name, :class => "col-sm-2 control-label") %>
+    <div class="col-sm-8">
+      <%= f.text_field(:name, :class => "form-control", :placeholder => :name) %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label(:franchise, :class => "col-sm-2 control-label") %>
+    <div class="col-sm-8">
+      <%= f.collection_select(:franchise, Team.select(:franchise).distinct, :franchise, :franchise, :class => "form-control") %>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <%= f.submit(:class => "btn btn-primary") %>
+    </div>
+  </div>
+<% end %>

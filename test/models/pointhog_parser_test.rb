@@ -94,6 +94,7 @@ class PointhogParserTest < ActiveSupport::TestCase
       #{@sample_html[:shootout]}
       #{@sample_html[:game]}
       #{@sample_html[:not_played_game]}
+      #{@sample_html[:game].gsub("09/12","09/30")}
       </table>
     EOS
 
@@ -101,10 +102,22 @@ class PointhogParserTest < ActiveSupport::TestCase
     @columns = PointhogParser.parse_header_row(page)
   end
 
-  test "can parse schedule" do
-    page = Nokogiri::HTML(@sample_html[:table])
-    games = PointhogParser.parse_schedule(page)
+  test "can identify finished seasons" do
+    page  = Nokogiri::HTML(open(SeasonTest::SAMPLE_COMPLETED_SEASON_SCHEDULE_URL))
+    pp    = PointhogParser.new(page)
 
+    assert_equal(6, pp.teams.size)
+    assert_equal(true, pp.season_complete?)
+    assert_equal(53, pp.games.size)
+  end
+
+  test "can parse schedule" do
+    page  = Nokogiri::HTML(@sample_html[:table])
+    pp    = PointhogParser.new(page)
+    games = pp.games
+
+    assert_equal(4, pp.teams.size)
+    assert_equal(false, pp.season_complete?)
     assert_equal(2, games.size)
 
     games.each do |g|
@@ -121,7 +134,7 @@ class PointhogParserTest < ActiveSupport::TestCase
     page = Nokogiri::HTML(bad_table)
 
     assert_raises do |r|
-      PointhogParser.parse_schedule(page)
+      PointhogParser.new(page)
     end
   end
 
@@ -151,10 +164,10 @@ class PointhogParserTest < ActiveSupport::TestCase
     page = Nokogiri::HTML(@sample_html[:shootout])
     game = PointhogParser.parse_row(@columns, page.css('tr').first)
 
-    assert_equal(DateTime.new(2016, 9, 12, 8+12, 45, 0, '-06:00'), game[PointhogParser::POINTHOG_DATE_COLUMN])
-    assert_equal("SIMPLE JACKS".downcase(), game[PointhogParser::POINTHOG_AWAY_COLUMN])
+    assert_equal(Date.new(2016, 9, 12), game[PointhogParser::POINTHOG_DATE_COLUMN])
+    assert_equal("SIMPLE JACKS".downcase.titleize, game[PointhogParser::POINTHOG_AWAY_COLUMN])
     assert_equal(2, game[PointhogParser::AWAY_SCORE_KEY])
-    assert_equal("BLACK JACK".downcase(), game[PointhogParser::POINTHOG_HOME_COLUMN])
+    assert_equal("BLACK JACK".downcase.titleize, game[PointhogParser::POINTHOG_HOME_COLUMN])
     assert_equal(3, game[PointhogParser::HOME_SCORE_KEY])
     assert_equal(true, game[PointhogParser::SHOOTOUT_KEY])
   end
@@ -164,10 +177,10 @@ class PointhogParserTest < ActiveSupport::TestCase
 
     game = PointhogParser.parse_row(@columns, page.css('tr').first)
 
-    assert_equal(DateTime.new(2016, 9, 12, 10+12, 0, 0, '-06:00'), game[PointhogParser::POINTHOG_DATE_COLUMN])
-    assert_equal("HIGHLANDERS".downcase(), game[PointhogParser::POINTHOG_AWAY_COLUMN])
+    assert_equal(Date.new(2016, 9, 12), game[PointhogParser::POINTHOG_DATE_COLUMN])
+    assert_equal("HIGHLANDERS".downcase.titleize, game[PointhogParser::POINTHOG_AWAY_COLUMN])
     assert_equal(0, game[PointhogParser::AWAY_SCORE_KEY])
-    assert_equal("CROWN KINGS".downcase(), game[PointhogParser::POINTHOG_HOME_COLUMN])
+    assert_equal("CROWN KINGS".downcase.titleize, game[PointhogParser::POINTHOG_HOME_COLUMN])
     assert_equal(6, game[PointhogParser::HOME_SCORE_KEY])
     assert_equal(false, game[PointhogParser::SHOOTOUT_KEY])
   end
@@ -200,5 +213,11 @@ class PointhogParserTest < ActiveSupport::TestCase
       assert("#{e}".include?("parse"))
       assert("#{e}".include?("#{@columns[PointhogParser::POINTHOG_AWAY_COLUMN]}"))
     end
+  end
+
+  test "can handle dates correctly" do
+    assert_equal(Date.new(2016, 10, 8), PointhogParser.parse_datetime("10/08/16 11:45 PM"))
+    assert_equal(Date.new(2016, 8, 10), PointhogParser.parse_datetime("08/10/16 06:45 PM"))
+    assert_equal(Date.new(2016, 8, 10), PointhogParser.parse_datetime(Date.new(2016, 8, 10)))
   end
 end
