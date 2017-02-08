@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160928215325) do
+ActiveRecord::Schema.define(version: 20161024123456) do
 
   create_table "elos", force: :cascade do |t|
     t.integer  "value",                      null: false
@@ -56,5 +56,13 @@ ActiveRecord::Schema.define(version: 20160928215325) do
   end
 
   add_index "teams", ["season_id"], name: "index_teams_on_season_id"
+
+  create_table "users", force: :cascade do |t|
+    t.string   "username",        null: false
+    t.string   "hashed_password", null: false
+    t.string   "salt",            null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+  end
 
 end

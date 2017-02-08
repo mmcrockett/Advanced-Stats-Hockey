@@ -1,31 +1,19 @@
-<p id="notice"><%= notice %></p>
-
-<h1>Listing Elos</h1>
-
-<table>
-  <thead>
+<div class="navbar navbar-default" style="background-color:#FFFFFF;padding:5px 5px;">
+  <p id="notice"><%= notice %></p>
+  <table class="table table-striped">
     <tr>
-      <th>Team</th>
-      <th>Value</th>
-      <th>Sample date</th>
-      <th colspan="3"></th>
+      <th>id</th>
+      <th>date</th>
+      <th>team</th>
+      <th>elo</th>
     </tr>
-  </thead>
-
-  <tbody>
     <% @elos.each do |elo| %>
       <tr>
-        <td><%= elo.team %></td>
-        <td><%= elo.value %></td>
+        <td><%= link_to(elo.id, edit_elo_path(elo)) %></td>
         <td><%= elo.sample_date %></td>
-        <td><%= link_to 'Show', elo %></td>
-        <td><%= link_to 'Edit', edit_elo_path(elo) %></td>
-        <td><%= link_to 'Destroy', elo, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= elo.team.name %></td>
+        <td><%= elo.value %></td>
       </tr>
     <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New Elo', new_elo_path %>
+  </table>
+</div>

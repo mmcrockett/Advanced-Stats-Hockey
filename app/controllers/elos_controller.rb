@@ -1,15 +1,11 @@
 class ElosController < ApplicationController
-  before_action :set_elo, only: [:show, :edit, :update, :destroy]
+  before_filter :elo_authorize, only: [:new, :edit, :update, :create]
+  before_action :set_elo, only: [:show, :edit, :update]
 
   # GET /elos
   # GET /elos.json
   def index
     @elos = Elo.all
-  end
-
-  # GET /elos/1
-  # GET /elos/1.json
-  def show
   end
 
   # GET /elos/new
@@ -48,16 +44,6 @@ class ElosController < ApplicationController
         format.html { render :edit }
         format.json { render json: @elo.errors, status: :unprocessable_entity }
       end
-    end
-  end
-
-  # DELETE /elos/1
-  # DELETE /elos/1.json
-  def destroy
-    @elo.destroy
-    respond_to do |format|
-      format.html { redirect_to elos_url, notice: 'Elo was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 

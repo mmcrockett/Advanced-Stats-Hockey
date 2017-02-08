@@ -1,0 +1,27 @@
+<%= form_for(@user, :html => { :class => "form-horizontal" }) do |f| %>
+  <% if @user.errors.any? %>
+    <% @user.errors.full_messages.each do |message| %>
+      <div class="alert alert-danger"><%= message %></div>
+    <% end %>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label(:username, :class => "col-sm-2 control-label") %>
+    <div class="col-sm-8">
+      <%= f.text_field(:username, :class => "form-control", :placeholder => :username) %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label(:password, :class => "col-sm-2 control-label") %>
+    <div class="col-sm-8">
+      <%= f.password_field(:password, :class => "form-control", :placeholder => :password) %>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <%= f.submit("Login", :class => "btn btn-primary") %>
+      <%= f.submit("Register", :class => "btn btn-warning") %>
+    </div>
+  </div>
+<% end %>
+

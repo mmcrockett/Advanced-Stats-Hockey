@@ -7,4 +7,7 @@ class ActiveSupport::TestCase
   fixtures :all
 
   # Add more helper methods to be used by all tests here...
+  def logged_in(user_id = 1)
+    @request.session[:user_id] = user_id
+  end
 end

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  id: 1
+  username: bbobberson
+  hashed_password: 5e67074d616ea1b273d11b0d512171d6f3aab231
+  salt: 702769803399600.6687368534156103
+
+two:
+  id: 2
+  username: mikemikerson
+  hashed_password: 5e67074d616ea1b273d11b0d512171d6f3aab231
+  salt: 702769803399600.6687368534156103

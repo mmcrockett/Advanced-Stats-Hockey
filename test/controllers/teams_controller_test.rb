@@ -9,41 +9,47 @@ class TeamsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:teams)
-  end
 
-  test "should get new" do
-    get :new
+    logged_in
+    get :index
     assert_response :success
+    assert_not_nil assigns(:teams)
   end
 
-  test "should create team" do
+  test "should create team only when logged in" do
+    assert_no_difference('Team.count') do
+      post :create, team: { franchise: @team.franchise, name: @team.name, season_id: @team.season_id }
+    end
+    assert_response :unauthorized
+
+    logged_in
     assert_difference('Team.count') do
       post :create, team: { franchise: @team.franchise, name: @team.name, season_id: @team.season_id }
     end
-
     assert_redirected_to team_path(assigns(:team))
   end
 
-  test "should show team" do
-    get :show, id: @team
-    assert_response :success
-  end
+  test "should get edit only when logged in" do
+    get :edit, id: @team
+    assert_response :unauthorized
 
-  test "should get edit" do
+    logged_in
     get :edit, id: @team
     assert_response :success
   end
 
-  test "should update team" do
-    patch :update, id: @team, team: { franchise: @team.franchise, name: @team.name, season_id: @team.season_id }
+  test "should update team only when logged in" do
+    expected_name = @team.name
+    new_name = 'Hello'
+    patch :update, id: @team, team: { franchise: @team.franchise, name: new_name, season_id: @team.season_id }
+    @team.reload
+    assert_equal(expected_name, @team.name)
+    assert_response :unauthorized
+
+    logged_in
+    patch :update, id: @team, team: { franchise: @team.franchise, name: new_name, season_id: @team.season_id }
+    @team.reload
+    assert_equal(new_name, @team.name)
     assert_redirected_to team_path(assigns(:team))
-  end
-
-  test "should destroy team" do
-    assert_difference('Team.count', -1) do
-      delete :destroy, id: @team
-    end
-
-    assert_redirected_to teams_path
   end
 end

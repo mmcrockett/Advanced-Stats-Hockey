@@ -9,41 +9,47 @@ class GamesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:games)
-  end
 
-  test "should get new" do
-    get :new
+    logged_in
+    get :index
     assert_response :success
+    assert_not_nil assigns(:games)
   end
 
-  test "should create game" do
+  test "should create game only when logged in" do
+    assert_no_difference('Game.count') do
+      post :create, game: { away_score: @game.away_score, away_team_id: @game.away_team_id, game_date: @game.game_date, home_score: @game.home_score, home_team_id: @game.home_team_id, overtime: @game.overtime }
+    end
+    assert_response :unauthorized
+
+    logged_in
     assert_difference('Game.count') do
       post :create, game: { away_score: @game.away_score, away_team_id: @game.away_team_id, game_date: @game.game_date, home_score: @game.home_score, home_team_id: @game.home_team_id, overtime: @game.overtime }
     end
-
     assert_redirected_to game_path(assigns(:game))
   end
 
-  test "should show game" do
-    get :show, id: @game
-    assert_response :success
-  end
+  test "should get edit only when logged in" do
+    get :edit, id: @game
+    assert_response :unauthorized
 
-  test "should get edit" do
+    logged_in
     get :edit, id: @game
     assert_response :success
   end
 
-  test "should update game" do
-    patch :update, id: @game, game: { away_score: @game.away_score, away_team_id: @game.away_team_id, game_date: @game.game_date, home_score: @game.home_score, home_team_id: @game.home_team_id, overtime: @game.overtime }
+  test "should update game only when logged in" do
+    expected_value = @game.away_score
+    new_value = 1232
+    patch :update, id: @game, game: { away_score: new_value, away_team_id: @game.away_team_id, game_date: @game.game_date, home_score: @game.home_score, home_team_id: @game.home_team_id, overtime: @game.overtime }
+    @game.reload
+    assert_equal(expected_value, @game.away_score)
+    assert_response :unauthorized
+
+    logged_in
+    patch :update, id: @game, game: { away_score: new_value, away_team_id: @game.away_team_id, game_date: @game.game_date, home_score: @game.home_score, home_team_id: @game.home_team_id, overtime: @game.overtime }
+    @game.reload
+    assert_equal(new_value, @game.away_score)
     assert_redirected_to game_path(assigns(:game))
-  end
-
-  test "should destroy game" do
-    assert_difference('Game.count', -1) do
-      delete :destroy, id: @game
-    end
-
-    assert_redirected_to games_path
   end
 end

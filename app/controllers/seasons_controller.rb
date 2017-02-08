@@ -1,4 +1,5 @@
 class SeasonsController < ApplicationController
+  before_filter :elo_authorize, only: [:new, :edit, :update, :create]
   before_action :set_season, only: [:edit, :update]
 
   # GET /seasons

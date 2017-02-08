@@ -9,41 +9,47 @@ class ElosControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:elos)
-  end
 
-  test "should get new" do
-    get :new
+    logged_in
+    get :index
     assert_response :success
+    assert_not_nil assigns(:elos)
   end
 
-  test "should create elo" do
+  test "should create elo only when logged in" do
+    assert_no_difference('Elo.count') do
+      post :create, elo: { sample_date: @elo.sample_date, team_id: @elo.team_id, value: @elo.value }
+    end
+    assert_response :unauthorized
+
+    logged_in
     assert_difference('Elo.count') do
       post :create, elo: { sample_date: @elo.sample_date, team_id: @elo.team_id, value: @elo.value }
     end
-
     assert_redirected_to elo_path(assigns(:elo))
   end
 
-  test "should show elo" do
-    get :show, id: @elo
-    assert_response :success
-  end
+  test "should get edit only when logged in" do
+    get :edit, id: @elo
+    assert_response :unauthorized
 
-  test "should get edit" do
+    logged_in
     get :edit, id: @elo
     assert_response :success
   end
 
-  test "should update elo" do
-    patch :update, id: @elo, elo: { sample_date: @elo.sample_date, team_id: @elo.team_id, value: @elo.value }
+  test "should update elo only when logged in" do
+    expected_value = @elo.value
+    new_value = 1232
+    patch :update, id: @elo, elo: { sample_date: @elo.sample_date, team_id: @elo.team_id, value: new_value }
+    @elo.reload
+    assert_equal(expected_value, @elo.value)
+    assert_response :unauthorized
+
+    logged_in
+    patch :update, id: @elo, elo: { sample_date: @elo.sample_date, team_id: @elo.team_id, value: new_value }
+    @elo.reload
+    assert_equal(new_value, @elo.value)
     assert_redirected_to elo_path(assigns(:elo))
-  end
-
-  test "should destroy elo" do
-    assert_difference('Elo.count', -1) do
-      delete :destroy, id: @elo
-    end
-
-    assert_redirected_to elos_path
   end
 end
