@@ -15,6 +15,9 @@
   <% if (true == Rails.env.development?) %>
     <%= javascript_tag("jQuery.development = true;") %>
   <% end %>
+  <% flash.each do |name, msg| %>
+    <%= content_tag :div, msg, class: "alert alert-info" %>
+  <% end %>
   <div id="main">
     <div class="container">
     <%= render :partial => "common/nav_bar" %>
