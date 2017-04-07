@@ -16,6 +16,16 @@ class PointhogParser
   POINTHOG_AWAY_COLUMN = 'away'
   POINTHOG_COLUMNS = [POINTHOG_DATE_COLUMN, POINTHOG_HOME_COLUMN, POINTHOG_AWAY_COLUMN]
 
+  DIVISION_SCHEDULE_URL_IDENTIFIER = "DivisionSchedule"
+
+  def self.load_html(pointhog_url)
+    if (false == pointhog_url.include?(DIVISION_SCHEDULE_URL_IDENTIFIER))
+      raise "!ERROR: Expect a url containing '#{DIVISION_SCHEDULE_URL_IDENTIFIER}' got '#{pointhog_url}'."
+    end
+
+    return Nokogiri::HTML(open(pointhog_url))
+  end
+
   def initialize(page)
     @season_complete = true
     @games = []
@@ -96,6 +106,10 @@ class PointhogParser
   def parse_schedule(page)
     columns = {}
     schedule_table   = page.css('table[id*=Schedule]')
+
+    if (nil == schedule_table)
+      raise "!ERROR: Couldn't find 'Schedule' in html."
+    end
 
     schedule_table.css('tr').each do |row|
       if (true == row[:class].include?("Header"))

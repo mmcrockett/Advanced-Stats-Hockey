@@ -1,9 +1,9 @@
 require 'test_helper'
-
 class SeasonTest < ActiveSupport::TestCase
-  SAMPLE_COMPLETED_SEASON_SCHEDULE_URL = "test/fixtures/pointhog_schedule_previous_season.html"
-  SAMPLE_ONGOING_SEASON_SCHEDULE_URL = "test/fixtures/pointhog_schedule.html"
-  SAMPLE_ONGOING_SEASON_SCHEDULE_LATER_DATE_URL = "test/fixtures/pointhog_schedule_later_date.html"
+  SAMPLE_COMPLETED_SEASON_SCHEDULE_URL = "test/fixtures/pointhog_schedule_previous_season#{PointhogParser::DIVISION_SCHEDULE_URL_IDENTIFIER}.html"
+  SAMPLE_ONGOING_SEASON_SCHEDULE_URL = "test/fixtures/pointhog_schedule#{PointhogParser::DIVISION_SCHEDULE_URL_IDENTIFIER}.html"
+  SAMPLE_ONGOING_SEASON_SCHEDULE_LATER_DATE_URL = "test/fixtures/pointhog_schedule_later_date#{PointhogParser::DIVISION_SCHEDULE_URL_IDENTIFIER}.html"
+  SAMPLE_SEASON_URL = "test/fixtures/pointhog_Season.html"
 
   test "parse always false for complete" do
     season = seasons(:complete)
@@ -41,6 +41,27 @@ class SeasonTest < ActiveSupport::TestCase
     assert_equal(2, season.games.where({:game_date => Date.new(2016,9,12)}).size)
     assert_equal(6, Team.where({:season => season}).size)
     assert_equal(false, season.complete?)
+  end
+
+  test "season urls ignore season name if name is set" do
+    season = Season.new({:name => 'blahblah', :pointhog_url => SAMPLE_SEASON_URL})
+    season.save!
+    assert_equal("blahblah", season.name)
+    assert_equal("http://www.PointHogSports.com/IceHockey/League/DivisionSchedule.aspx?7Mc2SbMG5aaSaf", season.pointhog_url)
+  end
+
+  test "season urls are converted to B1 division schedule urls and season name parsed" do
+    season = Season.new({:pointhog_url => SAMPLE_SEASON_URL})
+    season.save!
+    assert_equal("Summer 2016", season.name)
+    assert_equal("http://www.PointHogSports.com/IceHockey/League/DivisionSchedule.aspx?7Mc2SbMG5aaSaf", season.pointhog_url)
+  end
+
+  test "season urls are left alone if not containing #{Season::SEASON_URL_IDENTIFIER}" do
+    season = Season.new({:name => 'blah', :pointhog_url => SAMPLE_COMPLETED_SEASON_SCHEDULE_URL})
+    season.save!
+    assert_equal("blah", season.name)
+    assert_equal(SAMPLE_COMPLETED_SEASON_SCHEDULE_URL, season.pointhog_url)
   end
 
   test "data is loaded for create" do

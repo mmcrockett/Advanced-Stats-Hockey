@@ -3,14 +3,16 @@ require 'open-uri'
 class Season < ActiveRecord::Base
   has_many :teams
 
-  after_save  :load_data
+  after_save :load_data
+  validate :season_url
+
+  SEASON_URL_IDENTIFIER = "Season"
 
   def load_data
     if (true == self.parse?)
       teams = {}
-      page  = Nokogiri::HTML(open(self.pointhog_url))
 
-      pp = PointhogParser.new(page)
+      pp = PointhogParser.new(PointhogParser.load_html(self.pointhog_url))
 
       pp.teams.each do |team_name|
         add_team(team_name)
@@ -82,5 +84,27 @@ class Season < ActiveRecord::Base
     if (false == self.teams.exists?({:name => team_name}))
       self.teams << Team.new({:name => team_name})
     end
+  end
+
+  def season_url
+    if ((nil != self.pointhog_url) && (true == self.pointhog_url.include?(SEASON_URL_IDENTIFIER)))
+      page = Nokogiri::HTML(open(self.pointhog_url))
+
+      if ((nil == self.name) || (true == self.name.empty?))
+        self.name = page.css('span[id*=ContentMain_ContentHeaderAndLogo1_ContentHeaderLabelTitle]').first.text.strip()
+      end
+
+      new_url = page.css("a[href*=#{PointhogParser::DIVISION_SCHEDULE_URL_IDENTIFIER}]").css("a[title*=B1]").first.attributes['href'].text
+
+      if (nil == new_url)
+        errors.add(:pointhog_url, "Couldn't parse season url correctly.")
+        return false
+      else
+        Rails.logger.info("Detected season url changing url from '#{self.pointhog_url}' to '#{new_url}'.")
+        self.pointhog_url = new_url
+      end
+    end
+
+    return true
   end
 end

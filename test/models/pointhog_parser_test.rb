@@ -102,6 +102,13 @@ class PointhogParserTest < ActiveSupport::TestCase
     @columns = PointhogParser.parse_header_row(page)
   end
 
+  test "raises error if not the expected pointhog url" do
+    assert_raises do |r|
+      PointhogParser.load_html("http://www.pointhogsports.com/IceHockey/League/Season.aspx?xiMGSJMm5aaGa1")
+      assert_nil(r)
+    end
+  end
+
   test "can identify finished seasons" do
     page  = Nokogiri::HTML(open(SeasonTest::SAMPLE_COMPLETED_SEASON_SCHEDULE_URL))
     pp    = PointhogParser.new(page)
