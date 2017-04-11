@@ -1,8 +1,10 @@
 <div class="navbar navbar-default" style="background-color:#FFFFFF;padding:5px 5px;">
   <p id="notice"><%= notice %></p>
   <p>
-  <%= link_to new_season_path(), :class => "btn btn-default btn-sm" do %>
-    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
+  <% if (true == logged_in?) %>
+    <%= link_to new_season_path(), :class => "btn btn-default btn-sm" do %>
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
+    <% end %>
   <% end %>
   </p>
   <table class="table table-striped">

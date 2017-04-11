@@ -2,6 +2,35 @@ class ElosController < ApplicationController
   before_filter :elo_authorize, only: [:new, :edit, :update, :create]
   before_action :set_elo, only: [:show, :edit, :update]
 
+  def graph
+    @data = []
+    elos  = Elo.all.order(:sample_date => :asc)
+
+    if (false == elos.empty?)
+      default_entry = {:date => nil}
+
+      Team.select(:franchise).distinct.pluck(:franchise).each do |franchise|
+        default_entry[franchise] = Elo::DEFAULT_STARTING_ELO
+      end
+
+      @data << default_entry.merge({:date => elos.first.sample_date.yesterday})
+
+      elos.each do |elo|
+        if (@data.last[:date] != elo.sample_date)
+          new_entry = {}
+
+          @data.last.each_pair do |k,v|
+            new_entry[k] = v
+          end
+
+          @data << new_entry.merge({:date => elo.sample_date})
+        end
+
+        @data.last[elo.team.franchise] = elo.value
+      end
+    end
+  end
+
   # GET /elos
   # GET /elos.json
   def index
