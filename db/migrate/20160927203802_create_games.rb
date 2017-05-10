@@ -7,6 +7,7 @@ class CreateGames < ActiveRecord::Migration
       t.integer :away_score, :null => false
       t.boolean :overtime, :null => false
       t.boolean :playoff, :null => false, :default => false
+      t.boolean :championship, :null => false, :default => false
       t.boolean :elo_processed, :null => false, :default => false
       t.date :game_date, :null => false
 
