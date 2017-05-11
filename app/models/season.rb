@@ -19,8 +19,8 @@ class Season < ActiveRecord::Base
       end
 
       pp.games.each do |game|
-        home_team_name = game[PointhogParser::POINTHOG_HOME_COLUMN]
-        away_team_name = game[PointhogParser::POINTHOG_AWAY_COLUMN]
+        home_team_name = Team.new({:name => game[PointhogParser::POINTHOG_HOME_COLUMN]}).name
+        away_team_name = Team.new({:name => game[PointhogParser::POINTHOG_AWAY_COLUMN]}).name
         ruby_game_date = game[PointhogParser::POINTHOG_DATE_COLUMN]
 
         if (false == self.teams.find_by({:name => home_team_name}).home_games.exists?({:game_date => ruby_game_date}))
@@ -59,8 +59,8 @@ class Season < ActiveRecord::Base
       elo_change = Elo.home_elo_change(g.home_score, g.home_team.elo, g.away_score, g.away_team.elo, g.overtime?, g.playoff?)
 
       Season.transaction do |t|
-        g.home_team.elos << Elo.new({:sample_date => g.game_date, :value => (g.home_team.elo + elo_change)})
-        g.away_team.elos << Elo.new({:sample_date => g.game_date, :value => (g.away_team.elo - elo_change)})
+        g.home_team.elos << Elo.new({:sample_date => g.game_date, :value => (g.home_team.elo + elo_change), :game => g})
+        g.away_team.elos << Elo.new({:sample_date => g.game_date, :value => (g.away_team.elo - elo_change), :game => g})
         g.elo_processed = true
         g.save!
       end
@@ -81,8 +81,10 @@ class Season < ActiveRecord::Base
 
   private
   def add_team(team_name)
-    if (false == self.teams.exists?({:name => team_name}))
-      self.teams << Team.new({:name => team_name})
+    team = Team.new({:name => team_name})
+
+    if (false == self.teams.exists?({:name => team.name}))
+      self.teams << team
     end
   end
 

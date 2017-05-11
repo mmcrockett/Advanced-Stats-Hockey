@@ -1,4 +1,5 @@
 require 'test_helper'
+
 class SeasonTest < ActiveSupport::TestCase
   SAMPLE_COMPLETED_SEASON_SCHEDULE_URL = "test/fixtures/pointhog_schedule_previous_season#{PointhogParser::DIVISION_SCHEDULE_URL_IDENTIFIER}.html"
   SAMPLE_ONGOING_SEASON_SCHEDULE_URL = "test/fixtures/pointhog_schedule#{PointhogParser::DIVISION_SCHEDULE_URL_IDENTIFIER}.html"

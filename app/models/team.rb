@@ -6,16 +6,36 @@ class Team < ActiveRecord::Base
   has_many :elos
 
   before_update :franchise_reset
-  before_save :titleize_name
+  before_save :check_franchise
 
-  def titleize_name
-    self.name = self.name.downcase.titleize
+  def name=(name)
+    super(name.strip.downcase.titleize.gsub(/[^0-9a-z ]/i, ''))
+  end
 
+  def check_franchise
     if (nil == self.franchise)
       self.franchise = self.name
     end
 
     return true
+  end
+
+  def short_name
+    short_name = ""
+
+    if (true == self.name.is_a?(String))
+      parts = self.name.split(" ")
+
+      if (1 < parts.size)
+        parts.each do |p|
+          short_name = "#{short_name}#{p.first}"
+        end
+      else
+        short_name = self.name[0..2]
+      end
+    end
+
+    return short_name
   end
 
   def franchise_reset

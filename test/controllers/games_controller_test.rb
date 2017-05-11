@@ -23,10 +23,11 @@ class GamesControllerTest < ActionController::TestCase
     assert_response :unauthorized
 
     logged_in
+    set_back("blah")
     assert_difference('Game.count') do
       post :create, game: { away_score: @game.away_score, away_team_id: @game.away_team_id, game_date: @game.game_date, home_score: @game.home_score, home_team_id: @game.home_team_id, overtime: @game.overtime }
     end
-    assert_redirected_to game_path(assigns(:game))
+    assert_redirected_to "blah"
   end
 
   test "should get edit only when logged in" do
@@ -47,9 +48,10 @@ class GamesControllerTest < ActionController::TestCase
     assert_response :unauthorized
 
     logged_in
+    set_back(edit_game_path(@game))
     patch :update, id: @game, game: { away_score: new_value, away_team_id: @game.away_team_id, game_date: @game.game_date, home_score: @game.home_score, home_team_id: @game.home_team_id, overtime: @game.overtime }
     @game.reload
     assert_equal(new_value, @game.away_score)
-    assert_redirected_to game_path(assigns(:game))
+    assert_redirected_to edit_game_path(@game)
   end
 end

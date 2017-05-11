@@ -15,11 +15,37 @@ class TeamTest < ActiveSupport::TestCase
     assert_equal("hello", t.franchise)
   end
 
+  test "save team name removes non alpha numeric characters" do
+    t = Team.new({:name => "Mike's %AMAZIN99% Team"})
+    t.save
+    t.reload
+    assert_equal("Mikes Amazin99 Team", t.name)
+  end
+
+  test "save team name trims" do
+    t = Team.new({:name => "    Blah De Blah     "})
+    t.save
+    t.reload
+    assert_equal("Blah De Blah", t.name)
+  end
+
+
   test "save team name as titleized" do
     t = Team.new({:name => 'BLaH De bLAH'})
     t.save
     t.reload
     assert_equal("Blah De Blah", t.name)
+  end
+
+
+  test "can render a short name" do
+    no_name       = Team.new()
+    crazy_name    = Team.new({:name => '  BLaH De bLAH  '})
+    no_space_name = Team.new({:name => 'Highlanders'})
+
+    assert_equal("", no_name.short_name)
+    assert_equal("BDB", crazy_name.short_name)
+    assert_equal("Hig", no_space_name.short_name)
   end
 
   test "can reference home and away games" do
@@ -52,7 +78,7 @@ class TeamTest < ActiveSupport::TestCase
     assert_equal(franchise_c.elo, team_d_s0.elo)
     assert_equal(franchise_c.elo, team_d_s1.elo)
 
-    team_d_s0.elos << Elo.new({:value => 6, :sample_date => Date.new(2016, 10, 20)})
+    team_d_s0.elos << Elo.new({:value => 6, :sample_date => Date.new(2016, 10, 20), :game_id => -1})
     assert_equal(team_d_s0.elo, team_d_s1.elo)
     assert_equal(6, team_d_s1.elo)
   end

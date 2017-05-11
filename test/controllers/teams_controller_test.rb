@@ -23,10 +23,11 @@ class TeamsControllerTest < ActionController::TestCase
     assert_response :unauthorized
 
     logged_in
+    set_back("blah")
     assert_difference('Team.count') do
       post :create, team: { franchise: @team.franchise, name: @team.name, season_id: @team.season_id }
     end
-    assert_redirected_to team_path(assigns(:team))
+    assert_redirected_to "blah"
   end
 
   test "should get edit only when logged in" do
@@ -47,9 +48,10 @@ class TeamsControllerTest < ActionController::TestCase
     assert_response :unauthorized
 
     logged_in
+    set_back(edit_team_path(@team))
     patch :update, id: @team, team: { franchise: @team.franchise, name: new_name, season_id: @team.season_id }
     @team.reload
     assert_equal(new_name, @team.name)
-    assert_redirected_to team_path(assigns(:team))
+    assert_redirected_to edit_team_path(@team)
   end
 end

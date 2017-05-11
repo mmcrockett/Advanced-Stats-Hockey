@@ -1,5 +1,6 @@
 class Elo < ActiveRecord::Base
   belongs_to :team
+  belongs_to :game
 
   DEFAULT_STARTING_ELO = 1500
   K = BigDecimal.new(8)
