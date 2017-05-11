@@ -31,8 +31,6 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
-gem 'sqlite3'
-
 group :production do
   gem 'therubyracer', :platforms => :ruby
 end
@@ -46,10 +44,12 @@ end
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 2.0'
+  gem 'highline'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'capistrano', '3.6.0'
+  gem 'capistrano-secrets-yml', '~> 1.0.0'
   gem 'capistrano-rails'
   gem 'capistrano-bundler'
   gem 'capistrano-rvm'

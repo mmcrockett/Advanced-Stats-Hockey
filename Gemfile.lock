@@ -72,6 +72,7 @@ GEM
     execjs (2.7.0)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
+    highline (1.7.8)
     i18n (0.7.0)
     jasmine-core (2.4.1)
     jasmine-rails (0.12.6)
@@ -188,6 +189,7 @@ DEPENDENCIES
   capistrano-rails
   capistrano-rvm
   coffee-rails (~> 4.1.0)
+  highline
   jasmine-rails
   jbuilder (~> 2.0)
   jquery-rails
