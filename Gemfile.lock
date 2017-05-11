@@ -184,6 +184,7 @@ PLATFORMS
 DEPENDENCIES
   byebug
   capistrano (= 3.6.0)
+  capistrano-bundler
   capistrano-rails
   capistrano-rvm
   coffee-rails (~> 4.1.0)
