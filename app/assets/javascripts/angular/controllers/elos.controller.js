@@ -20,12 +20,9 @@ function(
     .$promise
     .then(
       function(data){
-        angular.forEach(data, function(obj, i) {
-          obj.date = new Date(obj.date);
-        });
+        $scope.jsLiteralData = JsLiteral.from_json(data);
 
-        $scope.eloData = data;
-        $scope.eloChart.data = JsLiteral.from_json($scope.eloData);
+        $scope.eloChart.data = $scope.jsLiteralData;
         Logger.debug("Retrieved elos, count '" + $scope.eloData.length + "'.");
       }
     ).catch(

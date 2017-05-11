@@ -18,13 +18,13 @@ class ElosControllerTest < ActionController::TestCase
 
   test "should create elo only when logged in" do
     assert_no_difference('Elo.count') do
-      post :create, elo: { sample_date: @elo.sample_date, team_id: @elo.team_id, value: @elo.value }
+      post :create, elo: { sample_date: @elo.sample_date, team_id: @elo.team_id, value: @elo.value, game_id:@elo.game_id }
     end
     assert_response :unauthorized
 
     logged_in
     assert_difference('Elo.count') do
-      post :create, elo: { sample_date: @elo.sample_date, team_id: @elo.team_id, value: @elo.value }
+      post :create, elo: { sample_date: @elo.sample_date, team_id: @elo.team_id, value: @elo.value, game_id:@elo.game_id }
     end
     assert_redirected_to elo_path(assigns(:elo))
   end

@@ -17,8 +17,8 @@ ActiveRecord::Schema.define(version: 20161024123456) do
     t.integer  "value",                      null: false
     t.date     "sample_date",                null: false
     t.boolean  "ignore",      default: true, null: false
-    t.integer  "team_id"
-    t.integer  "game_id"
+    t.integer  "team_id",                    null: false
+    t.integer  "game_id",                    null: false
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
   end
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 20161024123456) do
     t.integer  "away_score",                    null: false
     t.boolean  "overtime",                      null: false
     t.boolean  "playoff",       default: false, null: false
+    t.boolean  "championship",  default: false, null: false
     t.boolean  "elo_processed", default: false, null: false
     t.date     "game_date",                     null: false
     t.datetime "created_at",                    null: false

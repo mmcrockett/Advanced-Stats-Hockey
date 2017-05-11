@@ -10,7 +10,11 @@ class ElosController < ApplicationController
       default_entry = {:date => nil}
 
       Team.select(:franchise).distinct.pluck(:franchise).each do |franchise|
-        default_entry[franchise] = Elo::DEFAULT_STARTING_ELO
+        default_entry[franchise] = {
+          :elo => Elo::DEFAULT_STARTING_ELO,
+          :annotation => "Start",
+          :tooltip => Elo::DEFAULT_STARTING_ELO
+        }
       end
 
       @data << default_entry.merge({:date => elos.first.sample_date.yesterday})
@@ -20,13 +24,25 @@ class ElosController < ApplicationController
           new_entry = {}
 
           @data.last.each_pair do |k,v|
-            new_entry[k] = v
+            if (true == v.is_a?(Hash))
+              new_entry[k] = {
+                :elo => v[:elo],
+                :annotation => nil,
+                :tooltip => v[:elo]
+              }
+            elsif (true == v.is_a?(Date))
+              new_entry[k] = v
+            else
+              raise "Unexpected type '#{v.class}'."
+            end
           end
 
           @data << new_entry.merge({:date => elo.sample_date})
         end
 
-        @data.last[elo.team.franchise] = elo.value
+        @data.last[elo.team.franchise][:elo] = elo.value
+        @data.last[elo.team.franchise][:annotation] = elo.game.annotation(elo)
+        @data.last[elo.team.franchise][:tooltip]    = "#{elo.game}"
       end
     end
   end
@@ -84,6 +100,6 @@ class ElosController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def elo_params
-      params.require(:elo).permit(:team_id, :value, :sample_date)
+      params.require(:elo).permit(:team_id, :value, :game_id, :sample_date)
     end
 end
