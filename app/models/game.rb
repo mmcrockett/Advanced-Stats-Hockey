@@ -5,15 +5,16 @@ class Game < ActiveRecord::Base
   before_save :check_championship
 
   def to_s
-    return "#{self.winner.short_name} d. #{self.loser.short_name} #{self.winner_score}-#{self.loser_score}"
+    return "#{self.winner.abbreviated} d. #{self.loser.abbreviated} #{self.winner_score}-#{self.loser_score}"
   end
+  alias :tooltip :to_s
 
-  def annotation(elo)
+  def annotation(franchise_name)
     if (true == self.championship?)
-      if (elo.team.name == self.winner.name)
-        return "#{self.winner.short_name} Champions"
-      elsif (elo.team.name == self.loser.name)
-        return "#{self.loser.short_name} Finals Loss"
+      if (franchise_name == self.winner.franchise)
+        return "#{self.winner.franchise.abbreviated} Champions"
+      elsif (franchise_name == self.loser.franchise)
+        return "#{self.loser.franchise.abbreviated} Finals Loss"
       end
     end
 
@@ -34,6 +35,10 @@ class Game < ActiveRecord::Base
 
   def loser
     return outcome[:loser][:team]
+  end
+
+  def season
+    return self.home_team.season
   end
 
   private

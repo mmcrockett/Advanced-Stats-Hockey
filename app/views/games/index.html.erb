@@ -11,7 +11,6 @@
       <th>overtime?</th>
       <th>playoff?</th>
       <th>championship?</th>
-      <th>elo processed?</th>
     </tr>
     <% @games.each do |game| %>
       <tr>
@@ -37,13 +36,6 @@
         </td>
         <td>
           <% if (true == game.championship?) %>
-            <span class="glyphicon glyphicon-ok"></span>
-          <% else %>
-            <span class="glyphicon glyphicon-minus"></span>
-          <% end %>
-        </td>
-        <td>
-          <% if (true == game.elo_processed?) %>
             <span class="glyphicon glyphicon-ok"></span>
           <% else %>
             <span class="glyphicon glyphicon-minus"></span>

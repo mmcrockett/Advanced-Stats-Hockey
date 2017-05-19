@@ -11,6 +11,11 @@ class ActiveSupport::TestCase
     @request.session[:user_id] = user_id
   end
 
+  def request_json
+    @request.headers["Content-Type"] = 'application/json'
+    @request.headers["Accept"]     = 'application/json'
+  end
+
   def set_back(value)
     @request.env["HTTP_REFERER"] = value
   end

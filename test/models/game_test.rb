@@ -11,7 +11,6 @@ class GameTest < ActiveSupport::TestCase
 
   test "defaults are correct" do
     g = games(:game_0)
-    assert_not(g.elo_processed?)
     assert_not(g.playoff?)
   end
 end

@@ -2,16 +2,16 @@
   <p id="notice"><%= notice %></p>
   <table class="table table-striped">
     <tr>
-      <th>id</th>
       <th>date</th>
       <th>team</th>
+      <th>description</th>
       <th>elo</th>
     </tr>
     <% @elos.each do |elo| %>
       <tr>
-        <td><%= link_to(elo.id, edit_elo_path(elo)) %></td>
-        <td><%= elo.sample_date %></td>
-        <td><%= elo.team.name %></td>
+        <td><%= elo.date %></td>
+        <td><%= elo.franchise %></td>
+        <td><%= elo.note %></td>
         <td><%= elo.value %></td>
       </tr>
     <% end %>

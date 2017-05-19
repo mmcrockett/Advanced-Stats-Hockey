@@ -1,105 +1,16 @@
 class ElosController < ApplicationController
-  before_filter :elo_authorize, only: [:new, :edit, :update, :create]
-  before_action :set_elo, only: [:show, :edit, :update]
-
   def graph
-    @data = []
-    elos  = Elo.all.order(:sample_date => :asc)
-
-    if (false == elos.empty?)
-      default_entry = {:date => nil}
-
-      Team.select(:franchise).distinct.pluck(:franchise).each do |franchise|
-        default_entry[franchise] = {
-          :elo => Elo::DEFAULT_STARTING_ELO,
-          :annotation => "Start",
-          :tooltip => Elo::DEFAULT_STARTING_ELO
-        }
-      end
-
-      @data << default_entry.merge({:date => elos.first.sample_date.yesterday})
-
-      elos.each do |elo|
-        if (@data.last[:date] != elo.sample_date)
-          new_entry = {}
-
-          @data.last.each_pair do |k,v|
-            if (true == v.is_a?(Hash))
-              new_entry[k] = {
-                :elo => v[:elo],
-                :annotation => nil,
-                :tooltip => v[:elo]
-              }
-            elsif (true == v.is_a?(Date))
-              new_entry[k] = v
-            else
-              raise "Unexpected type '#{v.class}'."
-            end
-          end
-
-          @data << new_entry.merge({:date => elo.sample_date})
-        end
-
-        @data.last[elo.team.franchise][:elo] = elo.value
-        @data.last[elo.team.franchise][:annotation] = elo.game.annotation(elo)
-        @data.last[elo.team.franchise][:tooltip]    = "#{elo.game}"
-      end
-    end
+    @data = Elo.gdata
   end
 
-  # GET /elos
-  # GET /elos.json
   def index
-    @elos = Elo.all
-  end
-
-  # GET /elos/new
-  def new
-    @elo = Elo.new
-  end
-
-  # GET /elos/1/edit
-  def edit
-  end
-
-  # POST /elos
-  # POST /elos.json
-  def create
-    @elo = Elo.new(elo_params)
-
-    respond_to do |format|
-      if @elo.save
-        format.html { redirect_to @elo, notice: 'Elo was successfully created.' }
-        format.json { render :show, status: :created, location: @elo }
-      else
-        format.html { render :new }
-        format.json { render json: @elo.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PATCH/PUT /elos/1
-  # PATCH/PUT /elos/1.json
-  def update
-    respond_to do |format|
-      if @elo.update(elo_params)
-        format.html { redirect_to @elo, notice: 'Elo was successfully updated.' }
-        format.json { render :show, status: :ok, location: @elo }
-      else
-        format.html { render :edit }
-        format.json { render json: @elo.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_elo
-      @elo = Elo.find(params[:id])
+    @elos = []
+    
+    Elo.process.values.each do |franchise|
+      @elos << franchise.elos
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def elo_params
-      params.require(:elo).permit(:team_id, :value, :game_id, :sample_date)
-    end
+    @elos.flatten!
+    @elos.sort_by! { |elo| elo.date }
+  end
 end
