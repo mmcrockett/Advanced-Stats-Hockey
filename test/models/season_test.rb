@@ -98,47 +98,30 @@ class SeasonTest < ActiveSupport::TestCase
     end
   end
 
+  test "start date is the earliest game date or today if no games" do
+    season = seasons(:complete)
+    empty  = seasons(:empty)
+
+    assert_equal(games(:game_1).game_date, season.start_date)
+    assert_equal(Date.today, empty.start_date)
+  end
+
+  test "franchises returns a list of all franchises for the season" do
+    season = seasons(:complete)
+
+    assert_equal(Set.new(["TeamA", "TeamB", "TeamC"]), Set.new(season.franchises))
+    assert_equal(["TeamC"], seasons(:complete_2).franchises)
+  end
+
+  test "season is empty if no games exist" do
+    assert(false == seasons(:complete).empty?)
+    assert(true == seasons(:empty).empty?)
+  end
+
   test "finished season causes us to be marked complete" do
     season = Season.new({:name => 'test', :pointhog_url => SAMPLE_COMPLETED_SEASON_SCHEDULE_URL})
     season.save!
 
     assert_equal(true, season.complete?)
-  end
-
-  test "elo can be processed" do
-    show_elo = false
-    season = Season.new({:name => 'test', :pointhog_url => SAMPLE_COMPLETED_SEASON_SCHEDULE_URL})
-    season.save!
-    elo_total = 0
-    elos_count = 0
-
-    season.teams.each_with_index do |team,i|
-      if (true == show_elo)
-        team.elos.order({:sample_date => :asc}).each do |elo|
-          puts "#{elo.sample_date}:#{elo.team.name}:#{elo.value}"
-        end
-      end
-
-      elo_total += team.elo
-      elos_count += team.elos.size
-    end
-
-    assert_equal(Elo::DEFAULT_STARTING_ELO * season.teams.size, elo_total)
-    assert_equal(2*53, elos_count)
-    assert_equal(53, season.games.where({:elo_processed => true}).count)
-    assert_equal(0, season.games.where({:elo_processed => false}).count)
-
-    if (true == show_elo)
-      season.games.order({:game_date => :asc}).each do |game|
-        game_info = ""
-        pday = game.game_date.yesterday
-
-        [game.home_team, game.away_team].each do |team|
-          game_info += " #{team.name}:#{team.elo(pday)}:#{team.elo(game.game_date)}:#{team.elo(game.game_date) - team.elo(pday)}"
-        end
-
-        puts "#{game.game_date}:#{game.home_score}:#{game.away_score} #{game_info}"
-      end
-    end
   end
 end

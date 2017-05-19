@@ -1,6 +1,19 @@
 require 'test_helper'
 
 class EloTest < ActiveSupport::TestCase
+  test "elo initializes correctly" do
+    assert_equal(Elo::DEFAULT_STARTING_ELO, Elo.new({:date => Date.today}).value)
+    assert_equal(nil, Elo.new({:date => Date.today}).game)
+    assert_equal(games(:game_2), Elo.new(:game => games(:game_2)).game)
+    assert_equal(1470, Elo.new(:date => Date.today, :value => 1470).value)
+    assert_equal(Elo::DEFAULT_STARTING_ELO, Elo.new(:date => Date.today, :value => nil).value)
+  end
+
+  test "elo date returns game date or provided date" do
+    assert_equal(Date.today, Elo.new(:date => Date.today).date)
+    assert_equal(games(:game_2).game_date, Elo.new(:date => Date.today, :game => games(:game_2)).date)
+  end
+
   test "elo sanity checks" do
     # Underdog tie should get some points
     assert(0 < Elo.home_elo_change(3, 1400, 2, 1600, true, false))
@@ -124,5 +137,40 @@ class EloTest < ActiveSupport::TestCase
     assert_equal(0.76, Elo.expected_home_probability(1600, 1400).round(2))
     assert_equal(1-0.64, Elo.expected_home_probability(1450, 1550).round(2))
     assert_equal(1-0.76, Elo.expected_home_probability(1400, 1600).round(2))
+  end
+
+  test "processes elos" do
+    season = Season.new({:name => 'test', :pointhog_url => SeasonTest::SAMPLE_COMPLETED_SEASON_SCHEDULE_URL})
+    season.save!
+    elo_total  = 0
+    elos_count = 0
+
+    elo_results   = Elo.process
+
+    season.teams.each_with_index do |team,i|
+      elo_total  += elo_results[team.franchise].elo.value
+      elos_count += elo_results[team.franchise].elos.size
+    end
+
+    assert_equal(Elo::DEFAULT_STARTING_ELO * season.teams.size, elo_total)
+    assert_equal(season.games.size * 2 + season.teams.size, elos_count)
+
+    gdata_results = Elo.gdata
+
+    season.games.each do |game|
+      elo_total = 0
+      results_on_date = gdata_results.select { |result| (result[:date] == game.game_date) }
+
+      assert_equal(1, results_on_date.size, "Date should only have 1 entry '#{results_on_date}' '#{game.game_date}'.")
+      assert_equal(results_on_date.first.keys.size - 1, season.teams.size)
+
+      results_on_date.first.each_pair do |k,v|
+        if (:date != k)
+          elo_total += v[:elo]
+        end
+      end
+
+      assert_equal(Elo::DEFAULT_STARTING_ELO * season.teams.size, elo_total)
+    end
   end
 end

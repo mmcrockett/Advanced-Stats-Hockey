@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   mount JasmineRails::Engine => '/specs' if defined?(JasmineRails)
   match '/' => redirect('graph'), via: :get
-  resources :elos, :except  => [:destroy, :show]
+  resources :elos, :only => [:index]
   resources :games, :except => [:destroy, :show]
   resources :teams, :except => [:destroy, :show]
   resources :seasons, :except => [:destroy, :show]

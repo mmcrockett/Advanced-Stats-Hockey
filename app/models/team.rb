@@ -3,9 +3,7 @@ class Team < ActiveRecord::Base
 
   has_many :home_games, :class_name => 'Game', :foreign_key => "home_team_id"
   has_many :away_games, :class_name => 'Game', :foreign_key => "away_team_id"
-  has_many :elos
 
-  before_update :franchise_reset
   before_save :check_franchise
 
   def name=(name)
@@ -20,67 +18,15 @@ class Team < ActiveRecord::Base
     return true
   end
 
-  def short_name
-    short_name = ""
-
-    if (true == self.name.is_a?(String))
-      parts = self.name.split(" ")
-
-      if (1 < parts.size)
-        parts.each do |p|
-          short_name = "#{short_name}#{p.first}"
-        end
-      else
-        short_name = self.name[0..2]
-      end
-    end
-
-    return short_name
-  end
-
-  def franchise_reset
-    if (true == self.franchise_changed?)
-      Team.transaction do |t|
-        self.season.teams.each do |team|
-          team.elos.each do |elo|
-            elo.update({:ignore => true, :team_id => -1, :sample_date => Date.new(1980,1,1)})
-          end
-        end
-
-        self.season.games.each do |game|
-          game.update({:elo_processed => false})
-        end
-      end
-    end
-
-    return true
-  end
-
   def games
     return self.home_games + self.away_games
   end
 
-  def elo(requested_date = nil)
-    requested_elo       = nil
-    requested_elo_value = nil
-
-    if (nil == requested_date)
-      requested_elo = self.elos.order({:sample_date => :asc}).last
+  def abbreviated
+    if (nil == self.name)
+      return ""
     else
-      requested_elo = self.elos.where("sample_date <= ?", requested_date).order({:sample_date => :asc}).last
+      return self.name.abbreviated
     end
-
-    if (nil == requested_elo)
-      previous_franchises = Team.where("franchise = ? AND season_id != ?", self.franchise, self.season_id)
-      requested_elo = Elo.where({:team => previous_franchises}).order({:sample_date => :asc}).last
-    end
-
-    if (nil == requested_elo)
-      requested_elo_value = Elo::DEFAULT_STARTING_ELO
-    else
-      requested_elo_value = requested_elo.value
-    end
-
-    return requested_elo_value
   end
 end
