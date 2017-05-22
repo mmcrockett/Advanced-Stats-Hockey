@@ -7,6 +7,7 @@ set :repo_url, 'git@github.com:mmcrockett/Advanced-Stats-Hockey.git'
 append :linked_dirs, "log"
 append :linked_dirs, "tmp"
 append :linked_files, ".htaccess"
+append :linked_files, File.join('db', 'production.sqlite3')
 
 namespace :deploy do
   desc 'Restart application'
