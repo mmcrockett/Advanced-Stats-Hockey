@@ -86,7 +86,7 @@ class Elo
   def self.process(params = {:gdata => false})
     franchises = {}
     results    = []
-    seasons    = Season.all.sort_by { |season| season.start_date }
+    seasons    = Season.ordered_by_start_date(Season.all)
 
     seasons.each do |season|
       games = season.games.order({:game_date => :asc})

@@ -9,16 +9,16 @@
   </p>
   <table class="table table-striped">
     <tr>
-      <th>id</th>
       <th>name</th>
       <th>pointhog url</th>
+      <th>start date</th>
       <th>complete?</th>
     </tr>
-    <% @seasons.each do |season| %>
+    <% Season.ordered_by_start_date(@seasons).reverse.each do |season| %>
       <tr>
-        <td><%= link_to(season.id, edit_season_path(season)) %></td>
         <td><%= link_to(season.name, edit_season_path(season)) %></td>
         <td><%= season.pointhog_url %></td>
+        <td><%= season.start_date %></td>
         <td>
           <% if (true == season.complete?) %>
             <span class="glyphicon glyphicon-ok"></span>

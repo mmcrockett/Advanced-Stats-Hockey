@@ -14,6 +14,11 @@ class SeasonsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:seasons)
+
+    request_json
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:seasons)
   end
 
   test "should get new only when logged in" do

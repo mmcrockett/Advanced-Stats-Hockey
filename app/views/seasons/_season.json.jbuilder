@@ -1,2 +1,2 @@
-json.extract! season, :id, :name, :pointhog, :complete, :created_at, :updated_at
+json.extract! season, :id, :name, :pointhog_url, :complete, :start_date
 json.url season_url(season, format: :json)

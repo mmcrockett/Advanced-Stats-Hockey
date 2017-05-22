@@ -76,6 +76,10 @@ class Season < ActiveRecord::Base
     return false
   end
 
+  def self.ordered_by_start_date(seasons)
+    return seasons.sort_by { |season| season.start_date }
+  end
+
   private
   def add_team(team_name)
     team = Team.new({:name => team_name})
