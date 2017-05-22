@@ -1,4 +1,5 @@
 <div ng-controller="ElosController" ng-init="initialize()">
-  <div google-chart chart="eloChart" style="height:600px; width:100%;">
+  <progressbar class="progress-striped active" ng-show="progress.message" max="progress.total" value="100"><span style="color:white; white-space:nowrap;">{{progress.message}}</span></progressbar>
+  <div google-chart chart="eloChart" on-ready="clear_progress()" style="height:600px; width:100%;">
   </div>
 </div>
