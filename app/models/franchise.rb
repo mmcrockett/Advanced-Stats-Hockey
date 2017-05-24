@@ -1,15 +1,22 @@
 class Franchise
-  attr_accessor :name, :elos
+  attr_accessor :name, :elos, :disbanded_date
+
+  DEFAULT_GDATA = {
+    :elo => nil,
+    :tooltip => nil,
+    :annotation => nil
+  }
 
   def initialize(name)
     @name = name
     @elos = []
+    @disbanded_date = nil
   end
 
   def ==(other_franchise)
     if (true == other_franchise.is_a?(Franchise))
       if ((true == other_franchise.name.is_a?(String)) && (true == self.name.is_a?(String)))
-        return (self.name == other_francise.name)
+        return (self.name == other_franchise.name)
       else
         raise "Name in franchise is not a string."
       end
@@ -35,33 +42,56 @@ class Franchise
     return self
   end
 
+  def to_s
+    elo   = self.elo
+    value = -1
+
+    if (nil != elo)
+      value = elo.value
+    end
+
+    return "#{self.name}(#{value})"
+  end
+
   def to_gdata(date)
-    elo = self.elo(date)
+    elo  = self.elo(date)
+    data = {}.merge(DEFAULT_GDATA)
 
-    data = {:elo => elo.value}
+    if (nil != elo)
+      data[:elo]     = elo.value
 
-    if ((date == elo.date) && (true == elo.game.is_a?(Game)))
-      data[:tooltip]    = elo.game.tooltip
-      data[:annotation] = elo.game.annotation(self.name)
-    else
-      data[:tooltip]    = elo.value
-      data[:annotation] = nil
+      if (true == elo.game.is_a?(Game))
+        if (date == elo.date)
+          data[:tooltip]    = elo.note
+          data[:annotation] = elo.game.annotation(self.name)
+        else
+          data[:tooltip]    = "#{elo.value}"
+        end
+      else
+        data[:tooltip] = elo.note
+      end
     end
 
     return data
   end
 
+  def disbanded?(requested_date = Date.today)
+    if (nil == disbanded_date)
+      return false
+    else
+      return (disbanded_date <= requested_date)
+    end
+  end
+
   def elo(requested_date = nil)
     if (nil == requested_date)
       elo = @elos.first
+    elsif (true == self.disbanded?(requested_date))
+      elo = nil
     else
       elo = @elos.bsearch { |elo| elo.date <= requested_date }
     end
 
-    if (nil != elo)
-      return elo
-    else
-      return nil
-    end
+    return elo
   end
 end
