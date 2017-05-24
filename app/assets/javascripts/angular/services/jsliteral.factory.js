@@ -3,6 +3,17 @@ app.factory('JsLiteral', ['$log', 'humanizeFilter', function(Logger, HumanizeFil
   var CALLBACK='callback';
   var TYPE='type';
   var RESERVED_COLUMNS=_.constant(['annotation', 'tooltip']);
+  var EMPTY_DATA = _.constant({
+    cols:[
+      {label:null,type:'string'},
+      {label:null,type:'number'}
+    ],
+    rows:[
+      {c:[
+        {v:null},
+        {v:null}]}
+    ]
+  });
   var get_column_type = function(k, v, key_options) {
     if (true == _.has(key_options, TYPE)) {
       return key_options[TYPE];
@@ -128,6 +139,7 @@ app.factory('JsLiteral', ['$log', 'humanizeFilter', function(Logger, HumanizeFil
     STYLE: STYLE,
     CALLBACK: CALLBACK,
     TYPE: TYPE,
+    EMPTY_DATA: EMPTY_DATA,
     from_json: jsliteral_function,
     infer_column: infer_column,
     build_column: build_column
