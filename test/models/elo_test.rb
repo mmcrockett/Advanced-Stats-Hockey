@@ -221,5 +221,9 @@ class EloTest < ActiveSupport::TestCase
 
       assert_equal(Elo::DEFAULT_STARTING_ELO * season.teams.size, elo_total)
     end
+
+    labels = chart_data.gdata_labels
+
+    assert_equal(3, labels.size)
   end
 end
