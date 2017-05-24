@@ -44,6 +44,15 @@ class Season < ActiveRecord::Base
     end
   end
 
+  def short_name
+    parts = name.split(" ")
+
+    descriptor = parts.first.split("/").first
+    year       = parts.last.split("/").first
+
+    return "#{descriptor} #{year}"
+  end
+
   def start_date
     if (true == self.empty?)
       return Date.today

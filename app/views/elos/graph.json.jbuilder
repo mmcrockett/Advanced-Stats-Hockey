@@ -1,1 +1,2 @@
-json.array! @data
+json.labels(@labels)
+json.data(@data)

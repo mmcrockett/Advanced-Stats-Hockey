@@ -1,6 +1,9 @@
 class ElosController < ApplicationController
   def graph
-    @data = Elo.gdata
+    chart_data = Elo.process
+
+    @data   = chart_data.gdata
+    @labels = chart_data.gdata_labels
   end
 
   def index

@@ -67,6 +67,16 @@ class ChartData
     return results
   end
 
+  def gdata_labels
+    labels_data = []
+
+    @data.each do |data|
+      labels_data << {:label => data[:season].short_name, :date => data[:season].start_date}
+    end
+
+    return labels_data
+  end
+
   def data(requested_date = nil)
     if (nil == requested_date)
       return @data.first
