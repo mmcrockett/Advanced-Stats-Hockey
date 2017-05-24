@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :games, :except => [:destroy, :show]
   resources :teams, :except => [:destroy, :show]
   resources :seasons, :except => [:destroy, :show]
+  match 'seasons/refresh', :to => 'seasons#refresh', :via => [:get]
   match 'graph', :to => 'elos#graph',   :via => [:get]
   match 'users', :to => 'users#create', :via => [:post]
   match 'login', :to => 'users#index',  :via => [:get]

@@ -1,5 +1,5 @@
 class SeasonsController < ApplicationController
-  before_filter :elo_authorize, only: [:new, :edit, :update, :create]
+  before_filter :elo_authorize, only: [:new, :edit, :update, :create, :refresh]
   before_action :set_season, only: [:edit, :update]
 
   # GET /seasons
@@ -15,6 +15,20 @@ class SeasonsController < ApplicationController
 
   # GET /seasons/1/edit
   def edit
+  end
+
+  def refresh
+    games = 0
+
+    Season.where(:complete => false).each do |season|
+      games -= season.games.size
+      season.load_data
+      games += season.games.size
+    end
+
+    respond_to do |format|
+      format.html { redirect_to(seasons_url, {:notice => "'#{games.size}' new games loaded." }) }
+    end
   end
 
   # POST /seasons
