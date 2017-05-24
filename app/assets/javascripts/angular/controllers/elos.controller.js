@@ -10,7 +10,7 @@ function(
   JsLiteral
 ) {
   $scope.error = "";
-  $scope.progress = {message:""}
+  $scope.progress = {message:""};
   $scope.eloData = [];
   $scope.eloChart = {
     "type": "LineChart"
@@ -26,7 +26,10 @@ function(
     .then(
       function(data){
         $scope.progress.message = "Rendering chart...";
-        $scope.jsLiteralData = JsLiteral.from_json(data);
+        var js_literal_options = {'elo':{}};
+        js_literal_options.elo[JsLiteral.TYPE] = 'number';
+
+        $scope.jsLiteralData = JsLiteral.from_json(data, js_literal_options);
 
         $scope.eloChart.data = $scope.jsLiteralData;
         Logger.debug("Retrieved elos, count '" + data.length + "'.");

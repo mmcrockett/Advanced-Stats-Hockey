@@ -30,7 +30,6 @@ class FranchiseTest < ActiveSupport::TestCase
     assert_match(/Not an Elo class '/, err.message)
   end
 
-
   test "add throws if date is earlier" do
     f = Franchise.new("franchiseA")
 
@@ -55,6 +54,18 @@ class FranchiseTest < ActiveSupport::TestCase
     assert_equal(nil, f.elo(Date.today.yesterday.yesterday.yesterday))
   end
 
+  test "disbanded franchise returns nil elo after disband date" do
+    f = Franchise.new("franchiseA")
+
+    f.add(Elo.new(:date => Date.today.yesterday.yesterday))
+    f.add(Elo.new(:value => 1308, :date => Date.today.yesterday))
+    f.disbanded_date = Date.today.yesterday
+    assert_equal(1500, f.elo(Date.today.yesterday.yesterday).value)
+    assert_equal(nil, f.elo(Date.today.yesterday))
+    assert_equal(nil, f.elo(Date.today))
+    assert_equal(nil, f.elo(Date.today.tomorrow))
+  end
+
   test "creates a google chart entry" do
     f = Franchise.new("franchiseA")
     g = games(:game_0)
@@ -63,8 +74,8 @@ class FranchiseTest < ActiveSupport::TestCase
     f.add(Elo.new(:date => d))
     f.add(Elo.new(:value => 1308, :game => g))
 
-    assert_equal({:elo => 1500, :tooltip => 1500, :annotation => nil}, f.to_gdata(d))
-    assert_equal({:elo => 1500, :tooltip => 1500, :annotation => nil}, f.to_gdata(g.game_date.yesterday))
+    assert_equal({:elo => 1500, :tooltip => 1500.to_s, :annotation => nil}, f.to_gdata(d))
+    assert_equal({:elo => 1500, :tooltip => 1500.to_s, :annotation => nil}, f.to_gdata(g.game_date.yesterday))
     assert_equal({:elo => 1308, :tooltip => "#{g.tooltip}", :annotation => g.annotation("franchiseA")}, f.to_gdata(g.game_date))
   end
 end

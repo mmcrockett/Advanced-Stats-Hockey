@@ -5,8 +5,8 @@ class ElosController < ApplicationController
 
   def index
     @elos = []
-    
-    Elo.process.values.each do |franchise|
+
+    Elo.process.franchises.each do |franchise|
       @elos << franchise.elos
     end
 

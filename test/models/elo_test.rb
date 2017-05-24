@@ -129,6 +129,46 @@ class EloTest < ActiveSupport::TestCase
     end
   end
 
+  test "ignore recenter if mean is already default" do
+    f0 = Franchise.new("franchiseA").add(Elo.new(:date => Date.today.yesterday.yesterday))
+    f1 = Franchise.new("franchiseB").add(Elo.new(:date => Date.today.yesterday.yesterday))
+    f2 = Franchise.new("franchiseC").add(Elo.new(:date => Date.today.yesterday.yesterday))
+    f3 = Franchise.new("franchiseD").add(Elo.new(:date => Date.today.yesterday.yesterday))
+
+    franchises = [f0,f1,f2,f3]
+
+    f0.add(Elo.new(:date => Date.today.yesterday, :value => 1530))
+    f1.add(Elo.new(:date => Date.today.yesterday, :value => 1430))
+    f2.add(Elo.new(:date => Date.today.yesterday, :value => 1505))
+    f3.add(Elo.new(:date => Date.today.yesterday, :value => 1535))
+
+    Elo.recenter_mean(franchises)
+
+    assert_equal(1530, f0.elo.value)
+    assert_equal(1430, f1.elo.value)
+    assert_equal(1505, f2.elo.value)
+    assert_equal(1535, f3.elo.value)
+  end
+
+  test "can recenter the mean around default if necessary" do
+    f0 = Franchise.new("franchiseA").add(Elo.new(:date => Date.today.yesterday.yesterday))
+    f3 = Franchise.new("franchiseD").add(Elo.new(:date => Date.today.yesterday.yesterday))
+    total_elo = 0
+
+    franchises = [f0,f3]
+
+    f0.add(Elo.new(:date => Date.today.yesterday, :value => 1530))
+    f3.add(Elo.new(:date => Date.today.yesterday, :value => 1535))
+
+    Elo.recenter_mean(franchises)
+
+    franchises.each do |franchise|
+      total_elo += franchise.elo.value
+    end
+
+    assert((Elo::DEFAULT_STARTING_ELO * franchises.size - total_elo).abs <= 1, "Contraction should keep mean near #{Elo::DEFAULT_STARTING_ELO}.")
+  end
+
   test "probability model is correct" do
     assert(1 > Elo.expected_home_probability(500, 2500))
     assert(1 > Elo.expected_home_probability(2500, 500))
@@ -144,8 +184,10 @@ class EloTest < ActiveSupport::TestCase
     season.save!
     elo_total  = 0
     elos_count = 0
+    seasons = Season.all.sort_by { |season| season.start_date }
 
-    elo_results   = Elo.process
+    chart_data  = Elo.process
+    elo_results = chart_data.data(season.start_date)
 
     season.teams.each_with_index do |team,i|
       elo_total  += elo_results[team.franchise].elo.value
@@ -153,20 +195,27 @@ class EloTest < ActiveSupport::TestCase
     end
 
     assert_equal(Elo::DEFAULT_STARTING_ELO * season.teams.size, elo_total)
-    assert_equal(season.games.size * 2 + season.teams.size, elos_count)
 
-    gdata_results = Elo.gdata
+    # Starting and Ending extra elo for each team
+    assert_equal((season.games.size + season.teams.size) * 2, elos_count)
+
+    gdata_results = chart_data.gdata
 
     season.games.each do |game|
       elo_total = 0
       results_on_date = gdata_results.select { |result| (result[:date] == game.game_date) }
 
       assert_equal(1, results_on_date.size, "Date should only have 1 entry '#{results_on_date}' '#{game.game_date}'.")
-      assert_equal(results_on_date.first.keys.size - 1, season.teams.size)
+
+      season.teams.each do |team|
+        assert(results_on_date.first.keys.include?(team.franchise), "Missing entry for '#{team.franchise}'.")
+      end
 
       results_on_date.first.each_pair do |k,v|
         if (:date != k)
-          elo_total += v[:elo]
+          if (nil != v[:elo])
+            elo_total += v[:elo]
+          end
         end
       end
 

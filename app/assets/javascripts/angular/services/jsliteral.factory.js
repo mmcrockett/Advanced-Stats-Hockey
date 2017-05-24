@@ -62,15 +62,16 @@ app.factory('JsLiteral', ['$log', 'humanizeFilter', function(Logger, HumanizeFil
           var v_options   = {};
 
           if (true == angular.isObject(v)) {
-            var v_data = _.values(_.omit(v, RESERVED_COLUMNS()));
+            var sub_data = _.omit(v, RESERVED_COLUMNS());
             v_options  = _.pick(v, RESERVED_COLUMNS());
 
-            if (1 != v_data.length) {
+            if (1 != _.values(sub_data).length) {
               Logger.error("Tried to deconstruct an object with length != 1, taking first value '" + k + "' '" + angular.toJson(v) + "'.");
             }
 
-            v = _.first(v_data);
-            col_type = get_column_type(k, v, key_options);
+            v     = _.first(_.values(sub_data));
+            sub_k = _.first(_.keys(sub_data));
+            col_type = get_column_type(k, v, _.extend(key_options, options[sub_k]));
           }
 
           if (0 == i) {
@@ -107,6 +108,10 @@ app.factory('JsLiteral', ['$log', 'humanizeFilter', function(Logger, HumanizeFil
             row.c.push({v:v, p:style});
           } else {
             row.c.push({v:v});
+          }
+
+          if (true === jQuery.jsliteral_debug) {
+            Logger.debug("'" + v + "' '" + col_type + "' jsliteral_debug");
           }
 
           angular.forEach(v_options, function(v2, k2) {
