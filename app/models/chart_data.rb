@@ -45,6 +45,10 @@ class ChartData
     return self.data[:season]
   end
 
+  def franchise(franchise_name)
+    return @franchises[franchise_name]
+  end
+
   def franchises
     return @franchises.values
   end
@@ -71,7 +75,7 @@ class ChartData
     labels_data = []
 
     @data.each do |data|
-      labels_data << {:label => data[:season].short_name, :date => data[:season].start_date}
+      labels_data << {:label => data[:season].short_name, :date => data[:season].start_date.yesterday}
     end
 
     return labels_data
@@ -107,6 +111,7 @@ class ChartData
       new_data[franchise_name] = @franchises[franchise_name]
       this_season_franchises << @franchises[franchise_name]
       new_data[franchise_name].add(Elo.new(:value => value, :date => season.start_date.yesterday, :note => note))
+      @game_dates << season.start_date.yesterday
     end
 
     Elo.recenter_mean(this_season_franchises)

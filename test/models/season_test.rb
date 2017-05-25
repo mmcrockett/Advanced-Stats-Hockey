@@ -109,8 +109,8 @@ class SeasonTest < ActiveSupport::TestCase
   test "franchises returns a list of all franchises for the season" do
     season = seasons(:complete)
 
-    assert_equal(Set.new(["TeamA", "TeamB", "TeamC"]), Set.new(season.franchises))
-    assert_equal(["TeamC"], seasons(:complete_2).franchises)
+    assert_equal(Set.new(["Team A", "Team B", "Team C"]), Set.new(season.franchises))
+    assert_equal(["Team C"], seasons(:complete_2).franchises)
   end
 
   test "season is empty if no games exist" do

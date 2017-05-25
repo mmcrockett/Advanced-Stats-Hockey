@@ -7,6 +7,12 @@ class ElosControllerTest < ActionController::TestCase
     assert_not_nil assigns(:elos)
   end
 
+  test "should get lines" do
+    get :money_lines
+    assert_response :success
+    assert_not_nil assigns(:money_lines)
+  end
+
   test "should get google data" do
     get :graph
     assert_response :success

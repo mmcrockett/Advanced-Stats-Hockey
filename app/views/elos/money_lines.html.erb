@@ -1,0 +1,27 @@
+<div class="navbar navbar-default" style="background-color:#FFFFFF;padding:5px 5px;">
+  <p id="notice"><%= notice %></p>
+  <table class="table table-striped">
+    <tr>
+      <th>date</th>
+      <th>home</th>
+      <th>line</th>
+      <th>away</th>
+      <th>line</th>
+      <% if (true == logged_in?) %>
+        <th>vig</th>
+      <% end %>
+    </tr>
+    <% @money_lines.each do |money_line| %>
+      <tr>
+        <td><%= money_line.date %></td>
+        <td><%= money_line.home_identifier %></td>
+        <td><%= money_line.home_line %></td>
+        <td><%= money_line.away_identifier %></td>
+        <td><%= money_line.away_line %></td>
+        <% if (true == logged_in?) %>
+        <td><%= number_to_percentage(MoneyLine.vig_percent(money_line.home_line, money_line.away_line), :precision => 2) %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+</div>

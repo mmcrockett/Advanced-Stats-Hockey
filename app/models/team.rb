@@ -29,4 +29,18 @@ class Team < ActiveRecord::Base
       return self.name.abbreviated
     end
   end
+
+  def self.lookup(raw_name)
+    team_name = Team.new(:name => raw_name).name
+
+    return Team.find_by(:name => team_name)
+  end
+
+  def self.lookup_home(pp_game)
+    return Team.lookup(pp_game[PointhogParser::POINTHOG_HOME_COLUMN])
+  end
+
+  def self.lookup_away(pp_game)
+    return Team.lookup(pp_game[PointhogParser::POINTHOG_AWAY_COLUMN])
+  end
 end
