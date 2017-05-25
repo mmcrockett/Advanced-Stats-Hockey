@@ -1,6 +1,7 @@
 class PointhogParser
   attr_reader :games
   attr_reader :teams
+  attr_reader :pending_games
 
   HOME_SCORE_KEY = :home_score.to_s
   AWAY_SCORE_KEY = :away_score.to_s
@@ -29,6 +30,7 @@ class PointhogParser
   def initialize(page)
     @season_complete = true
     @games = []
+    @pending_games = []
     @teams = Set.new
 
     parse_schedule(page)
@@ -56,18 +58,18 @@ class PointhogParser
   end
 
   def self.parse_row(columns, row)
-    game   = {}
+    game   = {}.with_indifferent_access
     cells  = row.css('th,td')
     status = cells[-1].text().strip().downcase()
 
-    if (true == status.include?(POINTHOG_FINISHED_GAME_IDENTIFIER.downcase()))
-      POINTHOG_COLUMNS.each do |column_name|
-        game[column_name] = cells[columns[column_name]].text().strip().downcase().titleize()
-      end
+    POINTHOG_COLUMNS.each do |column_name|
+      game[column_name] = cells[columns[column_name]].text().strip().downcase().titleize()
+    end
+    game[POINTHOG_DATE_COLUMN] = PointhogParser.parse_datetime(game[POINTHOG_DATE_COLUMN])
 
+    if (true == status.include?(POINTHOG_FINISHED_GAME_IDENTIFIER.downcase()))
       game[HOME_SCORE_KEY] = PointhogParser.parse_score(cells, columns[POINTHOG_HOME_COLUMN])
       game[AWAY_SCORE_KEY] = PointhogParser.parse_score(cells, columns[POINTHOG_AWAY_COLUMN])
-      game[POINTHOG_DATE_COLUMN] = PointhogParser.parse_datetime(game[POINTHOG_DATE_COLUMN])
 
       if (true == status.include?(POINTHOG_SHOOTOUT_GAME_IDENTIFIER.downcase))
         game[SHOOTOUT_KEY] = true
@@ -103,7 +105,7 @@ class PointhogParser
   end
 
   private
-  def parse_schedule(page)
+  def parse_schedule(page, options = {:unfinished_games => false})
     columns = {}
     schedule_table   = page.css('table[id*=Schedule]')
 
@@ -120,9 +122,14 @@ class PointhogParser
         game = PointhogParser.parse_row(columns, row)
 
         if (false == game.empty?)
-          @teams << game[POINTHOG_HOME_COLUMN]
-          @teams << game[POINTHOG_AWAY_COLUMN]
-          @games << game
+          if (true == game.include?(SHOOTOUT_KEY))
+            @teams << game[POINTHOG_HOME_COLUMN]
+            @teams << game[POINTHOG_AWAY_COLUMN]
+            @games << game
+          else
+            @pending_games << game
+            @season_complete = false
+          end
         else
           @season_complete = false
           break

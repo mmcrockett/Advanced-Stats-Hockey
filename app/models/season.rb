@@ -19,14 +19,14 @@ class Season < ActiveRecord::Base
       end
 
       pp.games.each do |game|
-        home_team_name = Team.new({:name => game[PointhogParser::POINTHOG_HOME_COLUMN]}).name
-        away_team_name = Team.new({:name => game[PointhogParser::POINTHOG_AWAY_COLUMN]}).name
+        home_team      = Team.lookup_home(game)
+        away_team      = Team.lookup_away(game)
         ruby_game_date = game[PointhogParser::POINTHOG_DATE_COLUMN]
 
-        if (false == self.teams.find_by({:name => home_team_name}).home_games.exists?({:game_date => ruby_game_date}))
+        if (false == home_team.home_games.exists?({:game_date => ruby_game_date}))
           g = Game.new
-          g.home_team     = self.teams.find_by({:name => home_team_name})
-          g.away_team     = self.teams.find_by({:name => away_team_name})
+          g.home_team     = home_team
+          g.away_team     = away_team
           g.home_score    = game[PointhogParser::HOME_SCORE_KEY]
           g.away_score    = game[PointhogParser::AWAY_SCORE_KEY]
           g.overtime      = game[PointhogParser::SHOOTOUT_KEY]

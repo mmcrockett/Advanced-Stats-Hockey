@@ -2,25 +2,25 @@
 
 complete:
   name: complete
-  pointhog_url: MyString
+  pointhog_url: http://www.pointhogsports.com/IceHockey/League/DivisionSchedule.aspxFixture
   complete: true
 
 complete_2:
   name: complete_2
-  pointhog_url: MyString
+  pointhog_url: http://www.pointhogsports.com/IceHockey/League/DivisionSchedule.aspxFixture
   complete: true
 
 not_complete:
   name: not_complete
-  pointhog_url: MyString
+  pointhog_url: http://www.pointhogsports.com/IceHockey/League/DivisionSchedule.aspxFixture
   complete: false
 
 empty:
   name: empty
-  pointhog_url: MyString
+  pointhog_url: http://www.pointhogsports.com/IceHockey/League/DivisionSchedule.aspxFixture
   complete: false
 
 franchise_change:
   name: fchange
-  pointhog_url: none
+  pointhog_url: http://www.pointhogsports.com/IceHockey/League/DivisionSchedule.aspxFixture
   complete: false

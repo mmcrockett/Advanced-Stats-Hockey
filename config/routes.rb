@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   resources :seasons, :except => [:destroy, :show]
   match 'seasons/refresh', :to => 'seasons#refresh', :via => [:get]
   match 'graph', :to => 'elos#graph',   :via => [:get]
+  match 'lines', :to => 'elos#money_lines',   :via => [:get]
   match 'users', :to => 'users#create', :via => [:post]
   match 'login', :to => 'users#index',  :via => [:get]
   match 'logout',:to => 'users#logout', :via => [:get]

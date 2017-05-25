@@ -125,7 +125,7 @@ class PointhogParserTest < ActiveSupport::TestCase
 
     assert_equal(4, pp.teams.size)
     assert_equal(false, pp.season_complete?)
-    assert_equal(2, games.size)
+    assert_equal(3, games.size)
 
     games.each do |g|
       assert_equal(6, g.keys.size)
@@ -160,11 +160,11 @@ class PointhogParserTest < ActiveSupport::TestCase
     assert_equal(7, @columns[PointhogParser::POINTHOG_HOME_COLUMN])
   end
 
-  test "empty for game that has not been played" do
+  test "shootout empty for game that has not been played" do
     page = Nokogiri::HTML(@sample_html[:not_played_game])
     game = PointhogParser.parse_row(@columns, page.css('tr').first)
 
-    assert(game.empty?)
+    assert(false == game.include?(PointhogParser::SHOOTOUT_KEY))
   end
 
   test "can parse shootout row" do

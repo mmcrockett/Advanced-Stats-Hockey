@@ -6,6 +6,10 @@ class ElosController < ApplicationController
     @labels = chart_data.gdata_labels
   end
 
+  def money_lines
+    @money_lines = MoneyLine.get
+  end
+
   def index
     @elos = []
 
