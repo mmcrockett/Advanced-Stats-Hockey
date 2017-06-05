@@ -30,17 +30,21 @@ class Team < ActiveRecord::Base
     end
   end
 
-  def self.lookup(raw_name)
+  def self.lookup(raw_name, season)
     team_name = Team.new(:name => raw_name).name
 
-    return Team.find_by(:name => team_name)
+    if (false == season.is_a?(Season))
+      return Team.find_by(:name => team_name)
+    else
+      return season.teams.find_by(:name => team_name)
+    end
   end
 
-  def self.lookup_home(pp_game)
-    return Team.lookup(pp_game[PointhogParser::POINTHOG_HOME_COLUMN])
+  def self.lookup_home(pp_game, season = nil)
+    return Team.lookup(pp_game[PointhogParser::POINTHOG_HOME_COLUMN], season)
   end
 
-  def self.lookup_away(pp_game)
-    return Team.lookup(pp_game[PointhogParser::POINTHOG_AWAY_COLUMN])
+  def self.lookup_away(pp_game, season = nil)
+    return Team.lookup(pp_game[PointhogParser::POINTHOG_AWAY_COLUMN], season)
   end
 end

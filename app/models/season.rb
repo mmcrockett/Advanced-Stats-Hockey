@@ -19,8 +19,8 @@ class Season < ActiveRecord::Base
       end
 
       pp.games.each do |game|
-        home_team      = Team.lookup_home(game)
-        away_team      = Team.lookup_away(game)
+        home_team      = Team.lookup_home(game, self)
+        away_team      = Team.lookup_away(game, self)
         ruby_game_date = game[PointhogParser::POINTHOG_DATE_COLUMN]
 
         if (false == home_team.home_games.exists?({:game_date => ruby_game_date}))

@@ -14,6 +14,7 @@
     <tr>
       <th>name</th>
       <th>pointhog url</th>
+      <th>games played</th>
       <th>start date</th>
       <th>complete?</th>
     </tr>
@@ -21,6 +22,7 @@
       <tr>
         <td><%= link_to(season.name, edit_season_path(season)) %></td>
         <td><%= season.pointhog_url %></td>
+        <td><%= season.games.size %></td>
         <td><%= season.start_date %></td>
         <td>
           <% if (true == season.complete?) %>
