@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '3.6.0'
 
-set :application, 'advancedhockeystats'
+set :application, 'elohockey'
 set :repo_url, 'git@github.com:mmcrockett/Advanced-Stats-Hockey.git'
 
 append :linked_dirs, "log"
