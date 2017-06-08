@@ -7,8 +7,8 @@ class TeamsController < ApplicationController
   def index
     @teams = []
 
-    Team.select(:name).distinct.each do |team|
-      @teams << Team.where(:name => team.name).first
+    Team.select(:franchise).distinct.each do |team|
+      @teams << Team.where(:franchise => team.franchise).first
     end
   end
 
