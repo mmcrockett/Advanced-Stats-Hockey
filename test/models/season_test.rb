@@ -146,11 +146,11 @@ class SeasonTest < ActiveSupport::TestCase
 
   test "has a shortened name" do
     season1 = Season.new(:name => "Spring 2017")
-    season2 = Season.new(:name => "Fall/Winter 2016/2017")
+    season2 = Season.new(:name => "Fall/Winter 16")
     season3 = Season.new(:name => "Summer 2016")
 
-    assert_equal("Spring 2017", season1.short_name)
-    assert_equal("Fall 2016", season2.short_name)
-    assert_equal("Summer 2016", season3.short_name)
+    assert_equal("Spring17", season1.short_name)
+    assert_equal("Fall16", season2.short_name)
+    assert_equal("Summer16", season3.short_name)
   end
 end
