@@ -38,6 +38,25 @@ class Season < ActiveRecord::Base
       if (self.complete != pp.season_complete?)
         self.complete = pp.season_complete?
         self.save!
+
+        if (true == self.complete?)
+          teams_represented = Set.new
+
+          self.games.order({:game_date => :desc}).each do |g|
+            if ((false == teams_represented.include?(g.home_team.name)) || (false == teams_represented.include?(g.away_team.name)))
+              if (true == teams_represented.empty?)
+                g.championship = true
+              else
+                g.playoff = true
+              end
+
+              teams_represented << g.home_team.name
+              teams_represented << g.away_team.name
+
+              g.save!
+            end
+          end
+        end
       end
 
       self.reload
