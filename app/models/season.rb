@@ -69,7 +69,7 @@ class Season < ActiveRecord::Base
     descriptor = parts.first.split("/").first
     year       = parts.last.split("/").first
 
-    return "#{descriptor} #{year}"
+    return "#{descriptor}#{year.last(2)}"
   end
 
   def start_date
