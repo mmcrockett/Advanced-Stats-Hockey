@@ -17,6 +17,8 @@ class PointhogParser
   POINTHOG_AWAY_COLUMN = 'away'
   POINTHOG_COLUMNS = [POINTHOG_DATE_COLUMN, POINTHOG_HOME_COLUMN, POINTHOG_AWAY_COLUMN]
 
+  POINTHOG_IGNORE_TEAMS = ["All Star Game"]
+
   DIVISION_SCHEDULE_URL_IDENTIFIER = "DivisionSchedule"
 
   def self.load_html(pointhog_url)
@@ -121,7 +123,7 @@ class PointhogParser
       else
         game = PointhogParser.parse_row(columns, row)
 
-        if (false == game.empty?)
+        if (false == PointhogParser.ignore?(game))
           if (true == game.include?(SHOOTOUT_KEY))
             @teams << game[POINTHOG_HOME_COLUMN]
             @teams << game[POINTHOG_AWAY_COLUMN]
@@ -138,5 +140,19 @@ class PointhogParser
     end
 
     return self
+  end
+
+  def self.ignore?(pointhog_game)
+    home_team = pointhog_game[POINTHOG_HOME_COLUMN]
+    away_team = pointhog_game[POINTHOG_AWAY_COLUMN]
+
+    if (true == pointhog_game.empty?)
+      return true
+    elsif ((true == POINTHOG_IGNORE_TEAMS.include?(home_team)) || (true == POINTHOG_IGNORE_TEAMS.include?(away_team)))
+      Rails.logger.warn("Ignoring game '#{pointhog_game}' because a team matches '#{POINTHOG_IGNORE_TEAMS}'.")
+      return true
+    else
+      return false
+    end
   end
 end
