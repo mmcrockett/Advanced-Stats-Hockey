@@ -118,11 +118,30 @@ class SeasonTest < ActiveSupport::TestCase
     assert(true == seasons(:empty).empty?)
   end
 
-  test "finished season causes us to be marked complete" do
+  test "finished season causes us to be marked complete and marks last games as playoff" do
     season = Season.new({:name => 'test', :pointhog_url => SAMPLE_COMPLETED_SEASON_SCHEDULE_URL})
     season.save!
 
     assert_equal(true, season.complete?)
+
+    season.games.each do |g|
+      playoff_dates = []
+      
+      ["08/23/16 9:00 PM","08/23/16 10:15 PM","08/25/16 7:45 PM","08/27/16 5:45 PM","09/01/16 9:00 PM"].each do |playoff_date_str|
+        playoff_dates << PointhogParser.parse_datetime(playoff_date_str)
+      end
+
+      if (true == playoff_dates.include?(g.game_date))
+        assert(g.playoff?)
+
+        if (playoff_dates.last == g.game_date)
+          assert(g.championship?)
+        end
+      else
+        assert(false == g.championship?)
+        assert(false == g.playoff?)
+      end
+    end
   end
 
   test "has a shortened name" do
