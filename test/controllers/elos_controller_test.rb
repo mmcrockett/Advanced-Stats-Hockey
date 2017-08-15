@@ -16,8 +16,6 @@ class ElosControllerTest < ActionController::TestCase
   test "should get google data" do
     get :graph
     assert_response :success
-    assert_not_nil assigns(:data)
-    assert_not_nil assigns(:labels)
 
     request_json
     get :graph

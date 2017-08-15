@@ -10,7 +10,7 @@ function(
   JsLiteral
 ) {
   $scope.error = "";
-  $scope.progress = {message:""};
+  $scope.loading_message = "";
   $scope.eloData = [];
   $scope.eloChart = {
     data: JsLiteral.EMPTY_DATA(),
@@ -32,16 +32,16 @@ function(
     }
   };
   $scope.clear_progress = function() {
-    $scope.progress.message = "";
+    $scope.loading_message = "";
   };
   $scope.initialize = function() {
-    $scope.progress.message = "Loading data...";
+    $scope.loading_message = "Loading data...";
     Elo
     .get()
     .$promise
     .then(
       function(response){
-        $scope.progress.message = "Rendering chart...";
+        $scope.loading_message = "Rendering chart...";
         var js_literal_options = {'elo':{}};
         var data   = response.data;
         var labels = response.labels;

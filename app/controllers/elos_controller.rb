@@ -1,9 +1,11 @@
 class ElosController < ApplicationController
   def graph
-    chart_data = Elo.process
+    if (true == request.format.json?)
+      chart_data = Elo.process
 
-    @data   = chart_data.gdata
-    @labels = chart_data.gdata_labels
+      @data   = chart_data.gdata
+      @labels = chart_data.gdata_labels
+    end
   end
 
   def money_lines

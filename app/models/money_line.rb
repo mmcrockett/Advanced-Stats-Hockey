@@ -96,19 +96,24 @@ class MoneyLine
       chart_data    = Elo.process
 
       chosen_games.each do |pending_game|
-        money_line = MoneyLine.new(
-          :home_team => Team.lookup_home(pending_game),
-          :away_team => Team.lookup_away(pending_game),
-          :date => pending_game[PointhogParser::POINTHOG_DATE_COLUMN]
-        )
+        home_team = Team.lookup_home(pending_game)
+        away_team = Team.lookup_away(pending_game)
 
-        home_franchise = chart_data.franchise(money_line.home_team.franchise)
-        away_franchise = chart_data.franchise(money_line.away_team.franchise)
+        if ((nil != home_team) && (nil != away_team))
+          money_line = MoneyLine.new(
+            :home_team => home_team,
+            :away_team => away_team,
+            :date => pending_game[PointhogParser::POINTHOG_DATE_COLUMN]
+          )
 
-        money_line.home_elo = home_franchise.elo.value
-        money_line.away_elo = away_franchise.elo.value
+          home_franchise = chart_data.franchise(money_line.home_team.franchise)
+          away_franchise = chart_data.franchise(money_line.away_team.franchise)
 
-        money_lines << money_line
+          money_line.home_elo = home_franchise.elo.value
+          money_line.away_elo = away_franchise.elo.value
+
+          money_lines << money_line
+        end
       end
     end
 
